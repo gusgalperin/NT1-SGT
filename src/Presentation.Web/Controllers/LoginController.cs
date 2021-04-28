@@ -17,7 +17,7 @@ namespace Presentation.Web.Views.Login
         }
 
         [HttpPost]
-        public ActionResult Login(LoginViewModel model)
+        public ActionResult Login(LoginModel model)
         {
             return RedirectToAction("Index", "Home");
         }

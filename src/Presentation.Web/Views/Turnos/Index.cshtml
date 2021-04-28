@@ -1,0 +1,58 @@
+﻿@model Presentation.Web.Models.Turnos.TurnosViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Nuevo">Create New</a>
+</p>
+
+<div class="row">
+    <form asp-action="Index">
+        <label asp-for="Fecha" class="control-label"></label>
+        <input asp-for="Fecha" type="date" class="form-control" />
+        <input type="submit" value="Buscar" class="btn btn-primary" />
+    </form>
+</div>
+
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Horario
+            </th>
+            <th>
+                Profesional
+            </th>
+            <th>
+                Paciente
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Turnos) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoraInicio) - @Html.DisplayFor(modelItem => item.HoraFin)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProfesionalNombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PacienteNombre)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

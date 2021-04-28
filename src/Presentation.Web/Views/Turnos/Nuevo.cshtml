@@ -1,0 +1,87 @@
+﻿@model Presentation.Web.Models.Turnos.CrearTurnoViewModel
+
+@{
+    ViewData["Title"] = "Nuevo";
+}
+
+@section Head{
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        #slPacientes {
+            width: 350px;
+        }
+    </style>
+}
+
+<h1>Nuevo</h1>
+
+<h4>CrearTurnoModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Nuevo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Model.Fecha" class="control-label"></label>
+                <input id="fecha"  asp-for="Model.Fecha" type="date" class="form-control" />
+                <span asp-validation-for="Model.Fecha" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Model.PacienteId" class="control-label"></label>
+                <select id="slPacientes" asp-for="Model.PacienteId"></select>
+                <span asp-validation-for="Model.PacienteId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Model.ProfesionalId" class="control-label"></label>
+                <select id="slProfesionales" asp-for="Model.ProfesionalId">
+                    <option>Elija profesional</option>
+                    @foreach (var profesional in Model.Profesionales)
+                    {
+                        <option value="@profesional.Id"
+                                data-duracion-turno="@profesional.DuracionTurno">
+                            @profesional.Nombre
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Model.ProfesionalId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Model.HoraInicio" class="control-label"></label>
+                <select id="slHoraInicio" asp-for="Model.HoraInicio"></select>
+                <span asp-validation-for="Model.HoraInicio" class="text-danger"></span>
+            </div>
+
+            @*<div class="form-group">
+                <label asp-for="Model.HoraFin" class="control-label"></label>
+                <input asp-for="Model.HoraFin" class="form-control" hidden />
+            </div>*@
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script src="~/js/turnos/nuevo.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            let view = new nuevoTurno();
+        });
+    </script>
+}

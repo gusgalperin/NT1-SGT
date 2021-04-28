@@ -7,17 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation.Web", "src\Pre
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Core", "src\Domain.Core\Domain.Core.csproj", "{D786FE75-CE29-4A2D-A8C0-5C6930A3C859}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Entities", "src\Domain.Entities\Domain.Entities.csproj", "{BB5CF73F-9F4E-43C4-B399-C3A09817DBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Entities", "src\Domain.Entities\Domain.Entities.csproj", "{BB5CF73F-9F4E-43C4-B399-C3A09817DBCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Core.Tests", "tests\Domain.Core.Tests\Domain.Core.Tests.csproj", "{B8D96224-6943-4E88-9E11-552CB7FB344C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Core.Tests", "tests\Domain.Core.Tests\Domain.Core.Tests.csproj", "{B8D96224-6943-4E88-9E11-552CB7FB344C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{821450EA-B232-4CB2-9986-F2E1C502C574}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Utils", "tests\Tests.Utils\Tests.Utils.csproj", "{B4146DCA-3D1E-4D29-9115-F300CEB9063F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Utils", "tests\Tests.Utils\Tests.Utils.csproj", "{B4146DCA-3D1E-4D29-9115-F300CEB9063F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Entities.Tests", "tests\Domain.Entities.Tests\Domain.Entities.Tests.csproj", "{35913CF8-4971-4969-A04D-ED80B5F6912C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Entities.Tests", "tests\Domain.Entities.Tests\Domain.Entities.Tests.csproj", "{35913CF8-4971-4969-A04D-ED80B5F6912C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Data", "src\Infrastructure.Data\Infrastructure.Data.csproj", "{51FFCB29-DBAD-4BFE-9BB6-FDB69EA27926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Data", "src\Infrastructure.Data\Infrastructure.Data.csproj", "{51FFCB29-DBAD-4BFE-9BB6-FDB69EA27926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

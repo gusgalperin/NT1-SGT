@@ -1,5 +1,5 @@
 ﻿using Domain.Core.CqsModule.Command;
-using Domain.Core.Data.Repositories;
+using Domain.Core.Data;
 using Domain.Entities;
 using System;
 using System.Threading.Tasks;
@@ -27,14 +27,14 @@ namespace Domain.Core.Commands
     public class AgregarTurnoCommandHandler : ICommandHandler<AgregarTurnoCommand>
     {
         private readonly ICommandProcessor _commandProcessor;
-        private readonly ITurnoRepository _turnoRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AgregarTurnoCommandHandler(
             ICommandProcessor commandProcessor,
-            ITurnoRepository turnoRepository)
+            IUnitOfWork unitOfWork)
         {
             _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
-            _turnoRepository = turnoRepository ?? throw new ArgumentNullException(nameof(turnoRepository));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
         public async Task HandleAsync(AgregarTurnoCommand command)
@@ -44,7 +44,8 @@ namespace Domain.Core.Commands
 
             var turno = new Turno(command.IdProfesional, command.IdPaciente, command.Fecha, command.HoraInicio, command.HoraFin);
 
-            await _turnoRepository.AddAsync(turno);
+            await _unitOfWork.Turnos.AddAsync(turno);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

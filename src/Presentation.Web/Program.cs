@@ -1,19 +1,34 @@
+using Infrastructure.Data.Context;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Presentation.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            try
+            {
+                using (var scope = host.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+
+                    var context = services.GetRequiredService<DataContext>();
+                    await context.SeedDataAsync();
+                }
+
+                await host.RunAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

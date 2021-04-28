@@ -47,7 +47,7 @@ namespace Domain.Core.Commands
             if (command.HoraFin <= command.HoraInicio)
                 throw new UserException("La hora de fin debe ser posterior a la de incicio");
 
-            if (command.Fecha <= DateTime.UtcNow)
+            if (command.Fecha <= DateTime.Now.Date)
                 throw new UserException("La fecha debe ser mayor a hoy");
 
             await ValidarProfesionalAtiende(command);
@@ -58,7 +58,7 @@ namespace Domain.Core.Commands
         {
             var profesional = await _profesionalRepository.GetOneAsync(command.IdProfesional);
 
-            if (!profesional.Atiende(command.Fecha, command.HoraFin, command.HoraFin))
+            if (!profesional.Atiende(command.Fecha, command.HoraInicio, command.HoraFin))
                 throw new ProfesionalNoAtiendeException(profesional.Nombre, command.Fecha, command.HoraInicio, command.HoraFin);
         }
 

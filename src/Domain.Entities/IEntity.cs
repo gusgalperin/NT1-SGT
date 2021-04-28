@@ -2,11 +2,14 @@
 
 namespace Domain.Entities
 {
-    public abstract class Entity<Tid>
+    public abstract class Entity<TId>
+        where TId : IEquatable<TId>
     { 
-        public Tid Id { get; private set; }
+        public TId Id { get; private set; }
 
-        public Entity(Tid id)
+        protected Entity() { }
+
+        public Entity(TId id)
         {
             Id = id;
         }

@@ -4,6 +4,7 @@ using System.Text;
 using Xunit;
 using FluentAssertions;
 using Tests.Utils;
+using System.Linq;
 
 namespace Domain.Entities.Tests
 {
@@ -75,14 +76,13 @@ namespace Domain.Entities.Tests
 
             //act
 
-            var result = new Profesional("nombre", "email", "password", especialidades, dias);
+            var result = new Profesional("nombre", "email", "password", especialidades.ToList(), dias.ToList());
 
             //assert
 
             result.Nombre.Should().Be("nombre");
             result.Email.Should().Be("email");
             result.Password.Should().Be("password");
-            result.Especialidades.Should().BeEquivalentTo(especialidades);
             result.DiasQueAtiende.Should().BeEquivalentTo(dias);
         }
 
@@ -93,13 +93,13 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var p = new Profesional("nombre", "email", "password", especialidades, DiaHorario.DefaultTodaLaSemana());
+            var p = new Profesional("nombre", "email", "password", especialidades.ToList(), DiaHorario.DefaultTodaLaSemana());
 
             //act
 
             var result = p.Atiende(
                 new DateTimeOffset(2021, 4, 24, 1, 1, 1, 1, new TimeSpan()), //sabado
-                new TimeSpan(9, 0, 0), 
+                new TimeSpan(9, 0, 0),
                 new TimeSpan(10, 0, 0));
 
             //assert
@@ -114,7 +114,7 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var p = new Profesional("nombre", "email", "password", especialidades, DiaHorario.DefaultTodaLaSemana());
+            var p = new Profesional("nombre", "email", "password", especialidades.ToList(), DiaHorario.DefaultTodaLaSemana());
 
             //act
 
@@ -135,7 +135,7 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var p = new Profesional("nombre", "email", "password", especialidades, DiaHorario.DefaultTodaLaSemana());
+            var p = new Profesional("nombre", "email", "password", especialidades.ToList(), DiaHorario.DefaultTodaLaSemana());
 
             //act
 
@@ -156,7 +156,7 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var p = new Profesional("nombre", "email", "password", especialidades, DiaHorario.DefaultTodaLaSemana());
+            var p = new Profesional("nombre", "email", "password", especialidades.ToList(), DiaHorario.DefaultTodaLaSemana());
 
             //act
 

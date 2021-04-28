@@ -1,14 +1,19 @@
+using Domain.Core.Commands;
+using Domain.Core.CqsModule.Command;
+using Domain.Core.CqsModule.Query;
+using Domain.Core.Data;
+using Domain.Core.Data.Repositories;
+using Domain.Core.Queryes;
+using Infrastructure.Data.Context;
+using Infrastructure.Data.Repositories;
+using Infrastructure.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Presentation.Web
 {
@@ -25,12 +30,32 @@ namespace Presentation.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-            .AddCookie();
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie(x => x.LoginPath = "/Login/Index");
             services.AddAuthorization();
+
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DataContext")));
+
+            services.AddMvc();
+
+            services
+                .AddScoped<ICommandProcessor, CommandProcessor>()
+                .AddScoped<IQueryProcessor, QueryProcessor>()
+
+                .AddScoped<IPacienteRepository, PacienteRepository>()
+                .AddScoped<IProfesionalRepository, ProfesionalRepository>()
+                .AddScoped<ITurnoRepository, TurnoRepository>()
+
+                .AddScoped<IUnitOfWork, UnitOfWork>()
+
+                .AddScoped<ICommandHandler<AgregarTurnoCommand>, AgregarTurnoCommandHandler>()
+                .AddScoped<ICommandHandler<ValidarAgregarTurnoCommand>, ValidarAgregarTurnoCommandHandler>()
+                .AddScoped<IQueryHandler<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>, ObtenerAgendaDelDiaQueryHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

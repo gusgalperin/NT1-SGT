@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models
 {
-    public class LoginViewModel
+    public class LoginModel
     {
         [Required]
         [EmailAddress]

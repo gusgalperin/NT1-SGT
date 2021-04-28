@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities
 {
     public class Paciente : Entity<Guid>
     {
+        protected Paciente () { }
         public Paciente(string nombre, string dni, DateTime fechaNacimiento, DateTime fechaAlta)
             : base(Guid.NewGuid())
         {
@@ -27,5 +29,6 @@ namespace Domain.Entities
         public string Dni { get; private set; }
         public DateTime FechaNacimiento { get; private set; }
         public DateTime FechaAlta { get; private set; }
+        public ICollection<Turno> Turnos { get; private set; }
     }
 }

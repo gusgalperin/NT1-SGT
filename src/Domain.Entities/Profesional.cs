@@ -6,10 +6,16 @@ namespace Domain.Entities
 {
     public class Profesional : Usuario
     {
-        public IEnumerable<Especialidad> Especialidades { get; private set; }
-        public IEnumerable<DiaHorario> DiasQueAtiende { get; private set; }
+        public ICollection<ProfesionalEspecialidad> Especialidades { get; private set; }
+        public ICollection<DiaHorario> DiasQueAtiende { get; private set; }
+        public ICollection<ProfesionalCola> Cola { get; private set; }
+        public ICollection<Turno> Turnos { get; private set; }
 
-        public Profesional(string nombre, string email, string password, IEnumerable<Especialidad> especialidades, IEnumerable<DiaHorario> diasQueAtiende)
+        public TimeSpan DuracionTurno => TimeSpan.FromMinutes(30);
+
+        protected Profesional() { }
+
+        public Profesional(string nombre, string email, string password, IEnumerable<Especialidad> especialidades, ICollection<DiaHorario> diasQueAtiende)
             : base (nombre, email, password)
         {
             if (especialidades == null || !especialidades.Any())
@@ -22,7 +28,7 @@ namespace Domain.Entities
                 throw new ArgumentNullException(nameof(diasQueAtiende));
             }
 
-            Especialidades = especialidades;
+            Especialidades = especialidades.Select(x => new ProfesionalEspecialidad(x.Id)).ToList();
             DiasQueAtiende = diasQueAtiende;
         }
 
@@ -41,6 +47,8 @@ namespace Domain.Entities
     {
         public string Descripcion { get; private set; }
 
+        public ICollection<ProfesionalEspecialidad> Profesionales { get; private set; }
+
         public Especialidad(string descripcion)
             : base (Guid.NewGuid())
         {
@@ -53,9 +61,24 @@ namespace Domain.Entities
         }
     }
 
-    public class DiaHorario
+    public class ProfesionalEspecialidad
+    {
+        public ProfesionalEspecialidad(Guid especialidadId)
+        {
+            EspecialidadId = especialidadId;
+        }
+
+        public Guid ProfesionalId { get; private set; }
+        public Profesional Profesional { get; private set; }
+
+        public Guid EspecialidadId { get; private set; }
+        public Especialidad Especialidad { get; private set; }
+    }
+
+    public class DiaHorario : Entity<Guid>
     {
         public DiaHorario(DayOfWeek dia, TimeSpan horaDesde, TimeSpan horaHasta)
+            : base(Guid.NewGuid())
         {
             Dia = dia;
             HoraDesde = horaDesde;
@@ -65,8 +88,10 @@ namespace Domain.Entities
         public DayOfWeek Dia { get; private set; }
         public TimeSpan HoraDesde { get; private set; }
         public TimeSpan HoraHasta { get; private set; }
+        public Guid ProfesionalId { get; private set; }
+        public Profesional Profesional { get; private set; }
 
-        public static IEnumerable<DiaHorario> DefaultTodaLaSemana()
+        public static ICollection<DiaHorario> DefaultTodaLaSemana()
         {
             var nueve = new TimeSpan(9, 0, 0);
             var dieciocho = new TimeSpan(18, 0, 0);

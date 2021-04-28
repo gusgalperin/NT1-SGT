@@ -1,6 +1,7 @@
 ﻿using AutoFixture.Xunit2;
 using Domain.Core.Commands;
 using Domain.Core.CqsModule.Command;
+using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
 using Domain.Entities;
 using FluentAssertions;
@@ -18,6 +19,7 @@ namespace Domain.Core.Tests.Commands
         public async Task Handle_Valid_ShouldWork(
             [Frozen] Mock<ICommandProcessor> commandProcessorMock,
             [Frozen] Mock<ITurnoRepository> turnoRepoMock,
+            [Frozen] Mock<IUnitOfWork> uowMock,
             AgregarTurnoCommand command,
             AgregarTurnoCommandHandler sut
             )
@@ -33,6 +35,13 @@ namespace Domain.Core.Tests.Commands
                 .Setup(x => x.AddAsync(It.IsAny<Turno>()))
                 .Callback<Turno>(x => created = x);
 
+            uowMock
+                .SetupGet(x => x.Turnos)
+                .Returns(turnoRepoMock.Object);
+
+            uowMock
+                .Setup(x => x.SaveChangesAsync());
+
             //act
 
             await sut.HandleAsync(command);
@@ -41,11 +50,14 @@ namespace Domain.Core.Tests.Commands
 
             created.Should().NotBeNull();
             created.Estado.Should().Be(TurnoEstado.Pendiente);
-            created.IdProfesional.Should().Be(command.IdProfesional);
-            created.IdPaciente.Should().Be(command.IdPaciente);
+            created.ProfesionalId.Should().Be(command.IdProfesional);
+            created.PacienteId.Should().Be(command.IdPaciente);
             created.Fecha.Should().Be(command.Fecha);
             created.HoraInicio.Should().Be(command.HoraInicio);
             created.HoraFin.Should().Be(command.HoraFin);
+
+            turnoRepoMock.Verify(x => x.AddAsync(It.IsAny<Turno>()), Times.Once);
+            uowMock.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
     }
 }
