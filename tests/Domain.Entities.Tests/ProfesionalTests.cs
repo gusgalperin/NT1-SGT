@@ -169,5 +169,25 @@ namespace Domain.Entities.Tests
 
             result.Should().BeTrue();
         }
+
+        [Theory]
+        [DefaultData]
+        public Profesional EncolarPaciente_ColaVacia(Turno turno)
+        {
+            //arrange
+
+            var p = new Profesional("nombre", "email", "password", new List<Especialidad> { new Especialidad("sarasa")}, DiaHorario.DefaultTodaLaSemana());
+
+            //act
+
+            p.EncolarPaciente(turno, new TimeSpan(), new TimeSpan());
+
+            //assert
+
+            p.Cola.Should().NotBeEmpty();
+            p.Cola.Count().Should().Be(1);
+
+            return p;
+        }
     }
 }

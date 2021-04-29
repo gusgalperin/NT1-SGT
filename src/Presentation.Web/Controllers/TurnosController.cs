@@ -1,9 +1,9 @@
 ﻿using Domain.Core.CqsModule.Command;
 using Domain.Core.CqsModule.Query;
 using Domain.Core.Data.Repositories;
+using Domain.Core.Exceptions;
 using Domain.Core.Queryes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentation.Web.Models.Shared;
 using Presentation.Web.Models.Turnos;
 using System;
@@ -42,22 +42,30 @@ namespace Presentation.Web.Controllers
 
         public async Task<IActionResult> Nuevo()
         {
-            var profesionales = await _profesionalRepository.GetAllAsync();
-
             var viewModel = new CrearTurnoViewModel
             {
-                Profesionales = profesionales
+                Profesionales = await _profesionalRepository.GetAllAsync()
             };
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Nuevo(CrearTurnoModel model)
+        public async Task<IActionResult> Nuevo(CrearTurnoViewModel model)
         {
-            await _commandProcessor.ProcessCommandAsync(model.ToCommand());
+            try
+            {
+                await _commandProcessor.ProcessCommandAsync(model.ToCommand());
 
-            return RedirectToAction("Index", "Turnos");
+                return RedirectToAction("Index", "Turnos");
+            }
+            catch (UserException ex)
+            {
+                model.ExceptionMessage = $"No se pudo crear el turno: {ex.Message}";
+                model.Profesionales = await _profesionalRepository.GetAllAsync();
+
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -87,7 +95,7 @@ namespace Presentation.Web.Controllers
 
             var horaTurno = diaHorario.HoraDesde;
 
-            while(horaTurno < diaHorario.HoraHasta)
+            while (horaTurno < diaHorario.HoraHasta)
             {
                 listaHorarios.Add(new Select2Model { Id = horaTurno.ToString(), Text = horaTurno.ToString("hh\\:mm") });
                 horaTurno = horaTurno.Add(profesional.DuracionTurno);

@@ -3,6 +3,7 @@ using Domain.Core.CqsModule.Command;
 using Domain.Core.CqsModule.Query;
 using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
+using Domain.Core.Herlpers;
 using Domain.Core.Queryes;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Repositories;
@@ -44,6 +45,8 @@ namespace Presentation.Web
             services.AddMvc();
 
             services
+                .AddScoped<IDateTimeProvider, DateTimeProvider>()
+
                 .AddScoped<ICommandProcessor, CommandProcessor>()
                 .AddScoped<IQueryProcessor, QueryProcessor>()
 
@@ -51,7 +54,7 @@ namespace Presentation.Web
                 .AddScoped<IProfesionalRepository, ProfesionalRepository>()
                 .AddScoped<ITurnoRepository, TurnoRepository>()
 
-                .AddScoped<IUnitOfWork, UnitOfWork>()
+                .AddSingleton<IUnitOfWork, UnitOfWork>()
 
                 .AddScoped<ICommandHandler<AgregarTurnoCommand>, AgregarTurnoCommandHandler>()
                 .AddScoped<ICommandHandler<ValidarAgregarTurnoCommand>, ValidarAgregarTurnoCommandHandler>()

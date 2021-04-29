@@ -20,8 +20,7 @@ namespace Infrastructure.Data.Repositories
             return await _db.Turnos
                 .Where(x => x.ProfesionalId == idProfesional)
                 .Where(x => x.Fecha == fecha)
-                .Where(x => x.HoraFin <= horaInicio && x.HoraFin >= horaInicio)
-                .Where(x => x.HoraFin <= horaFin && x.HoraFin >= horaFin)
+                .Where(x => x.HoraInicio == horaInicio)
                 .FirstOrDefaultAsync();
         }
 

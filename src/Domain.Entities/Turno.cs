@@ -29,12 +29,28 @@ namespace Domain.Entities
 
         public Profesional Profesional { get; private set; }
         public Paciente Paciente { get; private set; }
+
+        public void CheckedIn()
+        {
+            Estado = TurnoEstado.Encolado;
+        }
+
+        public void Atendiendo()
+        {
+            Estado = TurnoEstado.EnAtencion;
+        }
+
+        public void FinalizaAtencion()
+        {
+            Estado = TurnoEstado.Finalizado;
+        }
     }
 
     public enum TurnoEstado
     {
         Pendiente,
-        EnProceso,
+        Encolado,
+        EnAtencion,
         Finalizado,
         PacienteAusente,
         Cancelado,

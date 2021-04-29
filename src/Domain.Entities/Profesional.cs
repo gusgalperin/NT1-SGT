@@ -41,23 +41,40 @@ namespace Domain.Entities
                     && horaDesde <= x.HoraHasta
                     && horaHasta >= x.HoraDesde);
         }
-    }
 
-    public class Especialidad : Entity<Guid>
-    {
-        public string Descripcion { get; private set; }
-
-        public ICollection<ProfesionalEspecialidad> Profesionales { get; private set; }
-
-        public Especialidad(string descripcion)
-            : base (Guid.NewGuid())
+        public void EncolarPaciente(Turno turno, TimeSpan horaActual, TimeSpan tolerancia)
         {
-            if (string.IsNullOrEmpty(descripcion))
+            /*
+             * si la cola esta vacía, 
+                --> el orden es 1
+             * si el paciente llega despues del horario de su turno - teniendo en cuenta una tolerancia de 15 min - 
+                --> se lo ubica al final de la cola (max orden + 1)
+             * si el paciente llega antes del horario de su turno o dentro de la tolerancia (y la cola no esta vacía)
+                --> se lo ubica posterior el ultimo paciente encolado cuyo turno comience antes de la hora del turno del paciente que esta haciendo checkin
+             */
+
+            if (Cola == null || !Cola.Any())
             {
-                throw new ArgumentException($"'{nameof(descripcion)}' cannot be null or empty.", nameof(descripcion));
+                Cola = new List<ProfesionalCola> { new ProfesionalCola(horaActual, turno, 1) };
+                return;
             }
 
-            Descripcion = descripcion;
+            if (horaActual > turno.HoraInicio.Add(tolerancia))
+            {
+                Cola.Add(new ProfesionalCola(horaActual, turno, Cola.Count() + 1));
+                return;
+            }
+
+            Cola.Add(new ProfesionalCola(horaActual, turno, Cola.Count() + 1));
+
+            var cola = Cola.OrderBy(x => x.Turno.HoraInicio).ToList();
+
+            for (int i = 0; i < Cola.Count(); i++)
+            {
+                cola[i].NuevoOrden(i + 1);
+            }
+
+            Cola = cola;
         }
     }
 
@@ -73,37 +90,5 @@ namespace Domain.Entities
 
         public Guid EspecialidadId { get; private set; }
         public Especialidad Especialidad { get; private set; }
-    }
-
-    public class DiaHorario : Entity<Guid>
-    {
-        public DiaHorario(DayOfWeek dia, TimeSpan horaDesde, TimeSpan horaHasta)
-            : base(Guid.NewGuid())
-        {
-            Dia = dia;
-            HoraDesde = horaDesde;
-            HoraHasta = horaHasta;
-        }
-
-        public DayOfWeek Dia { get; private set; }
-        public TimeSpan HoraDesde { get; private set; }
-        public TimeSpan HoraHasta { get; private set; }
-        public Guid ProfesionalId { get; private set; }
-        public Profesional Profesional { get; private set; }
-
-        public static ICollection<DiaHorario> DefaultTodaLaSemana()
-        {
-            var nueve = new TimeSpan(9, 0, 0);
-            var dieciocho = new TimeSpan(18, 0, 0);
-
-            return new List<DiaHorario>
-            {
-                new DiaHorario(DayOfWeek.Monday, nueve, dieciocho),
-                new DiaHorario(DayOfWeek.Tuesday, nueve, dieciocho),
-                new DiaHorario(DayOfWeek.Wednesday, nueve, dieciocho),
-                new DiaHorario(DayOfWeek.Thursday, nueve, dieciocho),
-                new DiaHorario(DayOfWeek.Friday, nueve, dieciocho),
-            };
-        }
     }
 }

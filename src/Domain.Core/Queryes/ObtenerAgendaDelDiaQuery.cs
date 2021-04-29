@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Utils.Extensions;
 
 namespace Domain.Core.Queryes
 {
@@ -41,6 +40,7 @@ namespace Domain.Core.Queryes
             public string PacienteNombre { get; set; }
             public Guid ProfesionalId { get; set; }
             public string ProfesionalNombre { get; set; }
+            public TurnoEstado Estado { get; set; }
         }        
     }
 
@@ -57,6 +57,7 @@ namespace Domain.Core.Queryes
         public async Task<ObtenerAgendaDelDiaResult> ExecuteAsync(ObtenerAgendaDelDiaQuery query)
         {
             var turnos = (await _turnoRepository.GetAllAsync(query.Fecha))
+                .OrderBy(x => x.HoraInicio)
                 .ToList();
 
             var result = new ObtenerAgendaDelDiaResult(query.Fecha, ToResult(turnos)); 
@@ -76,7 +77,8 @@ namespace Domain.Core.Queryes
                     PacienteId = x.PacienteId,
                     PacienteNombre = x.Paciente.Nombre,
                     ProfesionalId = x.ProfesionalId,
-                    ProfesionalNombre = x.Profesional.Nombre
+                    ProfesionalNombre = x.Profesional.Nombre,
+                    Estado = x.Estado
                 };
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Domain.Core.Queryes;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,8 @@ namespace Presentation.Web.Models.Turnos
                         PacienteNombre = x.PacienteNombre,
                         ProfesionalId = x.ProfesionalId,
                         ProfesionalNombre = x.ProfesionalNombre,
-                        TurnoId = x.TurnoId
+                        TurnoId = x.TurnoId,
+                        Estado = x.Estado
                     })
                     .ToList()
             };
@@ -45,6 +47,7 @@ namespace Presentation.Web.Models.Turnos
             public string PacienteNombre { get; set; }
             public Guid ProfesionalId { get; set; }
             public string ProfesionalNombre { get; set; }
+            public TurnoEstado Estado { get; set; }
         }
     }
 }

@@ -8,20 +8,18 @@ namespace Domain.Core.Commands
 {
     public class AgregarTurnoCommand : ICommand
     {
-        public AgregarTurnoCommand(Guid idPaciente, Guid idProfesional, DateTime fecha, TimeSpan horaInicio, TimeSpan horaFin)
+        public AgregarTurnoCommand(Guid idPaciente, Guid idProfesional, DateTime fecha, TimeSpan horaInicio)
         {
             IdPaciente = idPaciente;
             IdProfesional = idProfesional;
             Fecha = fecha;
             HoraInicio = horaInicio;
-            HoraFin = horaFin;
         }
 
         public Guid IdPaciente { get; }
         public Guid IdProfesional { get; }
         public DateTime Fecha { get; }
         public TimeSpan HoraInicio { get; }
-        public TimeSpan HoraFin { get; }
     }
 
     public class AgregarTurnoCommandHandler : ICommandHandler<AgregarTurnoCommand>
@@ -39,10 +37,13 @@ namespace Domain.Core.Commands
 
         public async Task HandleAsync(AgregarTurnoCommand command)
         {
-            await _commandProcessor.ProcessCommandAsync(
-                ValidarAgregarTurnoCommand.From(command));
+            var profesional = await _unitOfWork.Profesionales.GetOneAsync(command.IdProfesional);
+            var horaFin = command.HoraInicio.Add(profesional.DuracionTurno);
 
-            var turno = new Turno(command.IdProfesional, command.IdPaciente, command.Fecha, command.HoraInicio, command.HoraFin);
+            await _commandProcessor.ProcessCommandAsync(
+                ValidarAgregarTurnoCommand.From(command, horaFin));
+
+            var turno = new Turno(command.IdProfesional, command.IdPaciente, command.Fecha, command.HoraInicio, horaFin);
 
             await _unitOfWork.Turnos.AddAsync(turno);
             await _unitOfWork.SaveChangesAsync();

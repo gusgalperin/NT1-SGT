@@ -1,21 +1,23 @@
 ﻿@model Presentation.Web.Models.Turnos.TurnosViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Turnos";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Nuevo">Create New</a>
-</p>
+<h1>Turnos</h1>
 
 <div class="row">
     <form asp-action="Index">
         <label asp-for="Fecha" class="control-label"></label>
         <input asp-for="Fecha" type="date" class="form-control" />
+
+        <br />
+
         <input type="submit" value="Buscar" class="btn btn-primary" />
+
+        <a asp-action="Nuevo" class="btn btn-primary">Crear nuevo</a>
     </form>
+
 </div>
 
 <br />
@@ -31,6 +33,9 @@
             </th>
             <th>
                 Paciente
+            </th>
+            <th>
+                Estado
             </th>
             <th></th>
         </tr>
@@ -48,9 +53,12 @@
                 @Html.DisplayFor(modelItem => item.PacienteNombre)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.DisplayFor(modelItem => item.Estado)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id=item.TurnoId }) |
+                @Html.ActionLink("Cancelar", "Details", new { id=item.TurnoId }) |
+                @Html.ActionLink("Check-in", "Delete", new { id=item.TurnoId })
             </td>
         </tr>
 }

@@ -1,6 +1,7 @@
 ﻿using Domain.Core.CqsModule.Command;
 using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
+using Domain.Core.Herlpers;
 using System;
 using System.Threading.Tasks;
 
@@ -23,9 +24,9 @@ namespace Domain.Core.Commands
         public TimeSpan HoraInicio { get; }
         public TimeSpan HoraFin { get; }
 
-        public static ValidarAgregarTurnoCommand From(AgregarTurnoCommand fromCommand)
+        public static ValidarAgregarTurnoCommand From(AgregarTurnoCommand fromCommand, TimeSpan horaFin)
         {
-            return new ValidarAgregarTurnoCommand(fromCommand.IdPaciente, fromCommand.IdProfesional, fromCommand.Fecha, fromCommand.HoraInicio, fromCommand.HoraFin);
+            return new ValidarAgregarTurnoCommand(fromCommand.IdPaciente, fromCommand.IdProfesional, fromCommand.Fecha, fromCommand.HoraInicio, horaFin);
         }
     }
 
@@ -33,13 +34,16 @@ namespace Domain.Core.Commands
     {
         private readonly ITurnoRepository _turnoRepository;
         private readonly IProfesionalRepository _profesionalRepository;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         public ValidarAgregarTurnoCommandHandler(
             ITurnoRepository turnoRepository,
-            IProfesionalRepository profesionalRepository)
+            IProfesionalRepository profesionalRepository,
+            IDateTimeProvider dateTimeProvider)
         {
             _turnoRepository = turnoRepository ?? throw new ArgumentNullException(nameof(turnoRepository));
             _profesionalRepository = profesionalRepository ?? throw new ArgumentNullException(nameof(profesionalRepository));
+            _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task HandleAsync(ValidarAgregarTurnoCommand command)
@@ -47,8 +51,10 @@ namespace Domain.Core.Commands
             if (command.HoraFin <= command.HoraInicio)
                 throw new UserException("La hora de fin debe ser posterior a la de incicio");
 
-            if (command.Fecha <= DateTime.Now.Date)
-                throw new UserException("La fecha debe ser mayor a hoy");
+            var horaInicioTurno = command.Fecha.AddHours(command.HoraInicio.TotalHours);
+
+            if (horaInicioTurno <= _dateTimeProvider.Ahora())
+                throw new UserException("La fecha debe ser mayor a 'ahora'");
 
             await ValidarProfesionalAtiende(command);
             await ValidarTurnoLibre(command);
