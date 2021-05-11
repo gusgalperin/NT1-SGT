@@ -12,6 +12,8 @@ namespace Domain.Entities
             HoraLlegada = horaLlegada;
             TurnoId = idTurno;
             Orden = orden;
+
+            OperationType = Entities.OperationType.Added;
         }
 
         public ProfesionalCola(TimeSpan horaLlegada, Turno turno, int orden) 
@@ -28,9 +30,13 @@ namespace Domain.Entities
         public Guid ProfesionalId { get; private set; }
         public Profesional Profesional { get; private set; }
 
+        public OperationType? OperationType { get; private set; }
+
         public void NuevoOrden(int orden)
         {
             Orden = orden;
+
+            OperationType = Entities.OperationType.Updated;
         }
     }
 }

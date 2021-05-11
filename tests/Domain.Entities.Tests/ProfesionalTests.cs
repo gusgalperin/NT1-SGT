@@ -5,6 +5,7 @@ using Xunit;
 using FluentAssertions;
 using Tests.Utils;
 using System.Linq;
+using Tests.Utils.Entities;
 
 namespace Domain.Entities.Tests
 {
@@ -176,7 +177,7 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var p = new Profesional("nombre", "email", "password", new List<Especialidad> { new Especialidad("sarasa")}, DiaHorario.DefaultTodaLaSemana());
+            var p = ProfesionalExtensions.ProfesionalDefault();
 
             //act
 
@@ -186,8 +187,33 @@ namespace Domain.Entities.Tests
 
             p.Cola.Should().NotBeEmpty();
             p.Cola.Count().Should().Be(1);
+            p.Cola.First().Turno.Should().Be(turno);
+            p.Cola.First().Orden.Should().Be(1);
 
             return p;
+        }
+
+        [Fact]
+        public void EncolarPaciente_PacienteLLegaTarde()
+        {
+            //arrange
+
+            var primerTurno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(10, 0, 0), new TimeSpan(10, 30, 0));
+            var turnoPaciente = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0), new TimeSpan(9, 30, 0));
+            var horaActual = new TimeSpan(9, 47, 0);
+
+            var p = EncolarPaciente_ColaVacia(primerTurno);
+
+            //act
+
+            p.EncolarPaciente(turnoPaciente, horaActual, TimeSpan.FromMinutes(15));
+
+            //assert
+
+            p.Cola.Should().NotBeEmpty();
+            p.Cola.Count().Should().Be(2);
+            p.Cola.Last().Turno.Should().Be(turnoPaciente);
+            p.Cola.Last().Orden.Should().Be(2);
         }
     }
 }

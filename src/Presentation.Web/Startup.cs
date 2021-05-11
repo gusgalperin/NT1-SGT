@@ -1,10 +1,8 @@
-using Domain.Core.Commands;
-using Domain.Core.CqsModule.Command;
-using Domain.Core.CqsModule.Query;
+using Domain.Core.CqsModule.Register;
 using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
-using Domain.Core.Herlpers;
-using Domain.Core.Queryes;
+using Domain.Core.Helpers;
+using Domain.Core.Options;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Repositories;
 using Infrastructure.Data.UnitOfWork;
@@ -15,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Presentation.Web
 {
@@ -27,10 +26,17 @@ namespace Presentation.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions()
+                .Configure<TurnoOptions>(Configuration.GetSection(nameof(TurnoOptions)));
             services.AddControllersWithViews();
+
+            services.AddLogging((ILoggingBuilder builder) =>
+            {
+                builder.AddConsole();
+            });
+
             services
                 .AddAuthentication(options =>
                 {
@@ -47,21 +53,15 @@ namespace Presentation.Web
             services
                 .AddScoped<IDateTimeProvider, DateTimeProvider>()
 
-                .AddScoped<ICommandProcessor, CommandProcessor>()
-                .AddScoped<IQueryProcessor, QueryProcessor>()
-
                 .AddScoped<IPacienteRepository, PacienteRepository>()
                 .AddScoped<IProfesionalRepository, ProfesionalRepository>()
                 .AddScoped<ITurnoRepository, TurnoRepository>()
 
-                .AddSingleton<IUnitOfWork, UnitOfWork>()
+                .AddScoped<IUnitOfWork, UnitOfWork>()
 
-                .AddScoped<ICommandHandler<AgregarTurnoCommand>, AgregarTurnoCommandHandler>()
-                .AddScoped<ICommandHandler<ValidarAgregarTurnoCommand>, ValidarAgregarTurnoCommandHandler>()
-                .AddScoped<IQueryHandler<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>, ObtenerAgendaDelDiaQueryHandler>();
+                .AddCqsModule();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -71,7 +71,6 @@ namespace Presentation.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();

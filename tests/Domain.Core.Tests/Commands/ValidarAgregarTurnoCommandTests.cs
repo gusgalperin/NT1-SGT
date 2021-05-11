@@ -2,7 +2,7 @@
 using Domain.Core.Commands;
 using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
-using Domain.Core.Herlpers;
+using Domain.Core.Helpers;
 using Domain.Entities;
 using FluentAssertions;
 using Moq;

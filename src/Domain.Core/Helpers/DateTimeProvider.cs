@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Domain.Core.Herlpers
+namespace Domain.Core.Helpers
 {
     public interface IDateTimeProvider
     {

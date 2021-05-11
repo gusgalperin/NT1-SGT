@@ -4,6 +4,7 @@ using Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
@@ -26,7 +27,40 @@ namespace Infrastructure.Data.Repositories
         {
             return await _db.Profesionales
                 .Include(x => x.DiasQueAtiende)
+                .Include(x => x.Cola)
                 .FirstOrDefaultAsync(x => x.Id.Equals(id));
+        }
+
+        public async Task UpdateColaAsync(Profesional profesional)
+        {
+            var dbSet = _db.Set<ProfesionalCola>();
+
+            foreach (var c in profesional.Cola)
+            {
+                if (!c.OperationType.HasValue)
+                    continue;
+
+                switch (c.OperationType.Value)
+                {
+                    case OperationType.Added:
+                        await dbSet.AddAsync(c);
+                        break;
+                    case OperationType.Updated:
+                        dbSet.Update(c);
+                        break;
+                }
+            }
+        }
+        
+        public async Task<IEnumerable<ProfesionalCola>> GetColaAsync(Guid profesionalId)
+        {
+            var dbSet = _db.Set<ProfesionalCola>();
+
+            return await dbSet.AsQueryable()
+                .Where(x => x.ProfesionalId == profesionalId)
+                .Include(x => x.Turno)
+                .Include(x => x.Turno.Paciente)
+                .ToListAsync();
         }
     }
 }

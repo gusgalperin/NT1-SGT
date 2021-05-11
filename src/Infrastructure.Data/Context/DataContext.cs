@@ -1,13 +1,18 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Data.Context
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public DataContext(DbContextOptions<DataContext> options, ILoggerFactory loggerFactory)
             : base(options)
-        { }
+        {
+            _loggerFactory = loggerFactory ?? throw new System.ArgumentNullException(nameof(loggerFactory));
+        }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Profesional> Profesionales { get; set; }
@@ -17,6 +22,14 @@ namespace Infrastructure.Data.Context
         public DbSet<ProfesionalCola> Colas { get; set; }
         public DbSet<Turno> Turnos { get; set; }
         public DbSet<DiaHorario> Horarios { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            #if DEBUG
+            builder.UseLoggerFactory(_loggerFactory);
+            builder.EnableSensitiveDataLogging();
+            #endif
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -110,6 +123,9 @@ namespace Infrastructure.Data.Context
             builder.Entity<Especialidad>()
                 .Property(p => p.Descripcion)
                 .IsRequired();
+
+            builder.Entity<ProfesionalCola>()
+                .Ignore(p => p.OperationType);
         }
 
         private void BuildTurno(ModelBuilder builder)
@@ -118,11 +134,6 @@ namespace Infrastructure.Data.Context
             builder.Entity<Turno>()
                 .Property(p => p.Fecha)
                 .HasColumnType("date");
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            //options.UseSqlServer("Server=localhost;Database=nt1-sgt;User=sa;Password=GGalp3r1n", x => x.MigrationsAssembly("Infrastructure.Data"));
         }
     }
 }

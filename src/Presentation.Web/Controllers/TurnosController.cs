@@ -1,7 +1,9 @@
-﻿using Domain.Core.CqsModule.Command;
+﻿using Domain.Core.Commands;
+using Domain.Core.CqsModule.Command;
 using Domain.Core.CqsModule.Query;
 using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
+using Domain.Core.Helpers;
 using Domain.Core.Queryes;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.Shared;
@@ -19,17 +21,20 @@ namespace Presentation.Web.Controllers
         private readonly ICommandProcessor _commandProcessor;
         private readonly IProfesionalRepository _profesionalRepository;
         private readonly IPacienteRepository _pacienteRepository;
+        private readonly ITurnoRepository _turnoRepository;
 
         public TurnosController(
             IQueryProcessor queryProcessor,
             ICommandProcessor commandProcessor,
             IProfesionalRepository profesionalRepository,
-            IPacienteRepository pacienteRepository)
+            IPacienteRepository pacienteRepository,
+            ITurnoRepository turnoRepository)
         {
             _queryProcessor = queryProcessor ?? throw new ArgumentNullException(nameof(queryProcessor));
             _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
             _profesionalRepository = profesionalRepository ?? throw new ArgumentNullException(nameof(profesionalRepository));
             _pacienteRepository = pacienteRepository ?? throw new ArgumentNullException(nameof(pacienteRepository));
+            _turnoRepository = turnoRepository ?? throw new ArgumentNullException(nameof(turnoRepository));
         }
 
         public async Task<IActionResult> Index(DateTimeOffset? fecha = null)
@@ -68,6 +73,20 @@ namespace Presentation.Web.Controllers
             }
         }
 
+        public async Task<IActionResult> CheckIn(Guid turnoId, DateTime fecha)
+        {
+            await _commandProcessor.ProcessCommandAsync(new PacienteCheckInCommand(turnoId));
+
+            return RedirectToAction("Index", fecha);
+        }
+
+        public async Task<IActionResult> Detalle(Guid id)
+        {
+            var e = await _turnoRepository.GetOneAsync(id);
+
+            return View(e);
+        }
+
         [HttpGet]
         [Route("turnos/pacientes")]
         public async Task<IEnumerable<Select2Model>> GetPacientesAsync([FromQuery] string query)
@@ -97,7 +116,7 @@ namespace Presentation.Web.Controllers
 
             while (horaTurno < diaHorario.HoraHasta)
             {
-                listaHorarios.Add(new Select2Model { Id = horaTurno.ToString(), Text = horaTurno.ToString("hh\\:mm") });
+                listaHorarios.Add(new Select2Model { Id = horaTurno.ToString(), Text = horaTurno.ToLegibleString() });
                 horaTurno = horaTurno.Add(profesional.DuracionTurno);
             }
 

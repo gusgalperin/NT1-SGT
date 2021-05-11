@@ -32,5 +32,13 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Profesional)
                 .ToListAsync();
         }
+
+        public override async Task<Turno> GetOneAsync(Guid id)
+        {
+            return await _db.Turnos
+                .Include(x => x.Paciente)
+                .Include(x => x.Profesional)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace Domain.Entities
             /*
              * si la cola esta vacía, 
                 --> el orden es 1
-             * si el paciente llega despues del horario de su turno - teniendo en cuenta una tolerancia de 15 min - 
+             * si el paciente llega despues del horario de su turno - teniendo en cuenta una tolerancia de 15 min (config) - 
                 --> se lo ubica al final de la cola (max orden + 1)
              * si el paciente llega antes del horario de su turno o dentro de la tolerancia (y la cola no esta vacía)
                 --> se lo ubica posterior el ultimo paciente encolado cuyo turno comience antes de la hora del turno del paciente que esta haciendo checkin
