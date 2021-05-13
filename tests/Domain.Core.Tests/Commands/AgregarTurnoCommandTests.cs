@@ -28,9 +28,6 @@ namespace Domain.Core.Tests.Commands
         {
             //arrange
 
-            commandProcessorMock
-                .Setup(x => x.ProcessCommandAsync(It.IsAny<ValidarAgregarTurnoCommand>()));
-
             Turno created = null;
 
             turnoRepoMock

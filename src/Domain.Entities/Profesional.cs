@@ -32,42 +32,48 @@ namespace Domain.Entities
             DiasQueAtiende = diasQueAtiende;
         }
 
-        public bool Atiende(DateTimeOffset fecha, TimeSpan horaDesde, TimeSpan horaHasta)
+        public bool Atiende(DateTimeOffset fecha, TimeSpan hora)
         {
             return DiasQueAtiende
-                .Any(x => x.Dia == fecha.DayOfWeek 
-                    && horaDesde >= x.HoraDesde
-                    && horaHasta <= x.HoraHasta
-                    && horaDesde <= x.HoraHasta
-                    && horaHasta >= x.HoraDesde);
+                .Where(x => x.Dia == fecha.DayOfWeek)
+                .Where(x => hora >= x.HoraDesde)
+                .Where(x => hora <= x.HoraHasta)
+                .Any();
         }
 
-        public void EncolarPaciente(Turno turno, TimeSpan horaActual, TimeSpan tolerancia)
+        public void EncolarPaciente(Turno turno, DateTime horaActual, TimeSpan tolerancia)
         {
             /*
              * si la cola esta vacía, 
                 --> el orden es 1
-             * si el paciente llega despues del horario de su turno - teniendo en cuenta una tolerancia de 15 min (config) - 
-                --> se lo ubica al final de la cola (max orden + 1)
-             * si el paciente llega antes del horario de su turno o dentro de la tolerancia (y la cola no esta vacía)
-                --> se lo ubica posterior el ultimo paciente encolado cuyo turno comience antes de la hora del turno del paciente que esta haciendo checkin
              */
 
             if (Cola == null || !Cola.Any())
             {
-                Cola = new List<ProfesionalCola> { new ProfesionalCola(horaActual, turno, 1) };
+                Cola = new List<ProfesionalCola> { new ProfesionalCola(horaActual.TimeOfDay, turno, 1) };
                 return;
             }
 
-            if (horaActual > turno.HoraInicio.Add(tolerancia))
+
+            /*
+             * si el paciente llega despues del horario de su turno - teniendo en cuenta una tolerancia de 15 min (config) - 
+                --> se lo ubica al final de la cola (max orden + 1)
+             */
+
+            if (horaActual > turno.FechaHoraInicio.Add(tolerancia))
             {
-                Cola.Add(new ProfesionalCola(horaActual, turno, Cola.Count() + 1));
+                Cola.Add(new ProfesionalCola(horaActual.TimeOfDay, turno, Cola.Count() + 1));
                 return;
             }
 
-            Cola.Add(new ProfesionalCola(horaActual, turno, Cola.Count() + 1));
+            /*
+             * si el paciente llega antes del horario de su turno o dentro de la tolerancia (y la cola no esta vacía)
+                --> se lo ubica posterior el ultimo paciente encolado cuyo turno comience antes de la hora del turno del paciente que esta haciendo checkin
+             */
 
-            var cola = Cola.OrderBy(x => x.Turno.HoraInicio).ToList();
+            Cola.Add(new ProfesionalCola(horaActual.TimeOfDay, turno, Cola.Count() + 1));
+
+            var cola = Cola.OrderBy(x => x.Turno.FechaHoraInicio).ToList();
 
             for (int i = 0; i < Cola.Count(); i++)
             {
@@ -75,6 +81,26 @@ namespace Domain.Entities
             }
 
             Cola = cola;
+        }
+
+        public void DesencolarPaciente(Guid turnoId)
+        {
+            var desencolado = false;
+
+            foreach (var turno in Cola)
+            {
+                if(turno.TurnoId == turnoId)
+                {
+                    turno.Delete();
+                    desencolado = true;
+                    continue;
+                }
+
+                if (desencolado)
+                {
+                    turno.NuevoOrden(turno.Orden - 1);
+                }
+            }
         }
     }
 

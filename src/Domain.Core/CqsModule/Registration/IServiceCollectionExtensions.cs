@@ -3,9 +3,8 @@ using Domain.Core.CqsModule.Command;
 using Domain.Core.CqsModule.Query;
 using Domain.Core.Queryes;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 
-namespace Domain.Core.CqsModule.Register
+namespace Domain.Core.CqsModule.Registration
 {
     public static class IServiceCollectionExtensions
     {
@@ -15,12 +14,16 @@ namespace Domain.Core.CqsModule.Register
                 .AddScoped<ICommandProcessor, CommandProcessor>()
                 .AddScoped<IQueryProcessor, QueryProcessor>()
 
+                //Commands
+
                 .AddScoped<ICommandHandler<AgregarTurnoCommand>, AgregarTurnoCommandHandler>()
-                .AddScoped<ICommandHandler<ValidarAgregarTurnoCommand>, ValidarAgregarTurnoCommandHandler>()
                 .AddScoped<ICommandHandler<PacienteCheckInCommand>, PacienteCheckInCommandHandler>()
+                .AddScoped<ICommandHandler<LlamarPacienteCommand>, LlamarPacienteCommandHandler>()
+
+                //Queries
 
                 .AddScoped<IQueryHandler<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>, ObtenerAgendaDelDiaQueryHandler>()
-                .AddScoped<IQueryHandler<ObtenerProfesionalColaQuery, IEnumerable<ObtenerProfesionalColaQueryResult>>, ObtenerProfesionalColaQueryHandler>();
+                .AddScoped<IQueryHandler<ObtenerProfesionalColaQuery, ObtenerProfesionalColaQueryResult>, ObtenerProfesionalColaQueryHandler>();
 
             return services;
         }

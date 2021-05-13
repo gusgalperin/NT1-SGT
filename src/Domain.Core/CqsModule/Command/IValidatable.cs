@@ -2,10 +2,9 @@
 
 namespace Domain.Core.CqsModule.Command
 {
-    public interface ICommandHandler<TCommand>
+    public interface IValidatable<TCommand>
         where TCommand : ICommand
     {
         Task ValidateAsync(TCommand command);
-        Task HandleAsync(TCommand command);
     }
 }

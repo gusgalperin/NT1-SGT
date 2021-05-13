@@ -20,14 +20,14 @@ namespace Domain.Core.Tests.Commands
         [DefaultData]
         public void Handle_ProfesionalNoAtiendeEnFecha_ShouldThrowEx(
             [Frozen] Mock<IProfesionalRepository> profesionalRepoMock,
-            ValidarAgregarTurnoCommandHandler sut
+            AgregarTurnoCommandHandler sut
             )
         {
             //arrange
 
             var hoy = DateTime.Now;
 
-            var command = new ValidarAgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), hoy.AddDays(1), new TimeSpan(9, 0, 0), new TimeSpan(10, 0, 0));
+            var command = new AgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), hoy.AddDays(1), new TimeSpan(9, 0, 0));
 
             var profesional = new Profesional("sarasa", "sarasa", "sarasa",
                 new List<Especialidad> { new Especialidad("sarasa") },
@@ -39,7 +39,7 @@ namespace Domain.Core.Tests.Commands
 
             //act
 
-            Func<Task> func = async () => await sut.HandleAsync(command);
+            Func<Task> func = async () => await sut.ValidateAsync(command);
 
             //assert
 
@@ -49,16 +49,16 @@ namespace Domain.Core.Tests.Commands
         [Theory]
         [DefaultData]
         public void Handle_HoraInicioSuperiorAHoraFin_ShouldThrowEx(
-            ValidarAgregarTurnoCommandHandler sut
+            AgregarTurnoCommandHandler sut
             )
         {
             //arrange
 
-            var command = new ValidarAgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0), new TimeSpan(9, 0, 0));
+            var command = new AgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0));
 
             //act
 
-            Func<Task> func = async () => await sut.HandleAsync(command);
+            Func<Task> func = async () => await sut.ValidateAsync(command);
 
             //assert
 
@@ -69,7 +69,7 @@ namespace Domain.Core.Tests.Commands
         [DefaultData]
         public void Handle_FechaMenorAAhora_ShouldThrowEx(
             [Frozen] Mock<IDateTimeProvider> dateTimeProviderMock,
-            ValidarAgregarTurnoCommandHandler sut
+            AgregarTurnoCommandHandler sut
             )
         {
             //arrange
@@ -78,7 +78,7 @@ namespace Domain.Core.Tests.Commands
 
             dateTimeProviderMock.Setup(x => x.Ahora()).Returns(ahora);
 
-            var command = new ValidarAgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), ahora.AddMinutes(-1), new TimeSpan(9, 0, 0), new TimeSpan(10, 0, 0));
+            var command = new AgregarTurnoCommand(Guid.NewGuid(), Guid.NewGuid(), ahora.AddMinutes(-1), new TimeSpan(9, 0, 0));
 
             //act
 
@@ -94,8 +94,8 @@ namespace Domain.Core.Tests.Commands
         public void Handle_TurnoOcupado_ShouldThrowEx(
             [Frozen] Mock<IProfesionalRepository> profesionalRepoMock,
             [Frozen] Mock<ITurnoRepository> turnoRepoMock,
-            ValidarAgregarTurnoCommand command,
-            ValidarAgregarTurnoCommandHandler sut
+            AgregarTurnoCommand command,
+            AgregarTurnoCommandHandler sut
             )
         {
             //arrange
@@ -113,7 +113,7 @@ namespace Domain.Core.Tests.Commands
             var turno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, new TimeSpan(), new TimeSpan());
 
             turnoRepoMock
-                .Setup(x => x.BuscarTurnoAsync(command.IdProfesional, command.Fecha, command.HoraInicio, command.HoraFin))
+                .Setup(x => x.BuscarTurnoAsync(command.IdProfesional, command.Fecha, command.HoraInicio))
                 .ReturnsAsync(turno);
 
             //act

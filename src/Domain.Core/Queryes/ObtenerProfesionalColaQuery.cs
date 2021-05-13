@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Queryes
 {
-    public class ObtenerProfesionalColaQuery : IQuery<IEnumerable<ObtenerProfesionalColaQueryResult>>
+    public class ObtenerProfesionalColaQuery : IQuery<ObtenerProfesionalColaQueryResult>
     {
         public Guid ProfesionalId { get; }
 
@@ -21,12 +21,22 @@ namespace Domain.Core.Queryes
 
     public class ObtenerProfesionalColaQueryResult
     {
-        public Guid Id { get; set; }
-        public string Paciente { get; set; }
-        public string HoraTurno { get; set; }
+        public IEnumerable<ObtenerProfesionalColaQueryResultItem> Cola { get; set; }
+
+        public string Profesional { get; set; }
+        public Guid ProfesionalId { get; set; }
+
+        public class ObtenerProfesionalColaQueryResultItem
+        {
+            public Guid Id { get; set; }
+            public Guid TurnoId { get; set; }
+            public string Paciente { get; set; }
+            public string HoraTurno { get; set; }
+            public string HoraLlegada { get; set; }
+        }
     }
 
-    public class ObtenerProfesionalColaQueryHandler : IQueryHandler<ObtenerProfesionalColaQuery, IEnumerable<ObtenerProfesionalColaQueryResult>>
+    public class ObtenerProfesionalColaQueryHandler : IQueryHandler<ObtenerProfesionalColaQuery, ObtenerProfesionalColaQueryResult>
     {
         private readonly IProfesionalRepository _profesionalRepository;
 
@@ -35,19 +45,28 @@ namespace Domain.Core.Queryes
             _profesionalRepository = profesionalRepository ?? throw new ArgumentNullException(nameof(profesionalRepository));
         }
 
-        public async Task<IEnumerable<ObtenerProfesionalColaQueryResult>> ExecuteAsync(ObtenerProfesionalColaQuery query)
+        public async Task<ObtenerProfesionalColaQueryResult> ExecuteAsync(ObtenerProfesionalColaQuery query)
         {
-            var cola = await _profesionalRepository.GetColaAsync(query.ProfesionalId);
+            var profesional = await _profesionalRepository.GetOneAsync(query.ProfesionalId);
 
-            return cola
-                .OrderBy(x => x.Orden)
-                .Select(x => new ObtenerProfesionalColaQueryResult
-                {
-                    Id = x.Id,
-                    HoraTurno = $"{x.Turno.HoraInicio.ToLegibleString()} {x.Turno.HoraFin.ToLegibleString()}",
-                    Paciente = x.Turno.Paciente.Nombre
-                })
-                .ToList();
+            var result = new ObtenerProfesionalColaQueryResult
+            {
+                Profesional = profesional.Nombre,
+                ProfesionalId = profesional.Id,
+                Cola = profesional.Cola
+                    .OrderBy(x => x.Orden)
+                    .Select(x => new ObtenerProfesionalColaQueryResult.ObtenerProfesionalColaQueryResultItem
+                    {
+                        Id = x.Id,
+                        TurnoId = x.Turno.Id,
+                        HoraTurno = $"{x.Turno.HoraInicio.ToLegibleString()} {x.Turno.HoraFin.ToLegibleString()}",
+                        Paciente = x.Turno.Paciente.Nombre,
+                        HoraLlegada = x.HoraLlegada.ToLegibleString()
+                    })
+                    .ToList()
+            };
+
+            return result;
         }
     }
 }

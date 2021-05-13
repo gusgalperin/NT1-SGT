@@ -15,7 +15,7 @@ namespace Infrastructure.Data.Repositories
             : base(dataContext)
         { }
 
-        public async Task<Turno> BuscarTurnoAsync(Guid idProfesional, DateTimeOffset fecha, TimeSpan horaInicio, TimeSpan horaFin)
+        public async Task<Turno> BuscarTurnoAsync(Guid idProfesional, DateTimeOffset fecha, TimeSpan horaInicio)
         {
             return await _db.Turnos
                 .Where(x => x.ProfesionalId == idProfesional)
@@ -38,6 +38,7 @@ namespace Infrastructure.Data.Repositories
             return await _db.Turnos
                 .Include(x => x.Paciente)
                 .Include(x => x.Profesional)
+                .Include(x => x.Profesional.Cola)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }

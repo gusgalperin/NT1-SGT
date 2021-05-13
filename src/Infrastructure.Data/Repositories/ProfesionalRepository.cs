@@ -28,6 +28,8 @@ namespace Infrastructure.Data.Repositories
             return await _db.Profesionales
                 .Include(x => x.DiasQueAtiende)
                 .Include(x => x.Cola)
+                .Include("Cola.Turno")
+                .Include("Cola.Turno.Paciente")
                 .FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
 
@@ -47,6 +49,9 @@ namespace Infrastructure.Data.Repositories
                         break;
                     case OperationType.Updated:
                         dbSet.Update(c);
+                        break;
+                    case OperationType.Deleted:
+                        dbSet.Remove(c);
                         break;
                 }
             }

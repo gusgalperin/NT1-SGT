@@ -100,8 +100,7 @@ namespace Domain.Entities.Tests
 
             var result = p.Atiende(
                 new DateTimeOffset(2021, 4, 24, 1, 1, 1, 1, new TimeSpan()), //sabado
-                new TimeSpan(9, 0, 0),
-                new TimeSpan(10, 0, 0));
+                new TimeSpan(9, 0, 0));
 
             //assert
 
@@ -121,8 +120,7 @@ namespace Domain.Entities.Tests
 
             var result = p.Atiende(
                 new DateTimeOffset(2021, 4, 23, 1, 1, 1, 1, new TimeSpan()), //viernes
-                new TimeSpan(19, 0, 0),
-                new TimeSpan(14, 0, 0));
+                new TimeSpan(19, 0, 0));
 
             //assert
 
@@ -142,8 +140,7 @@ namespace Domain.Entities.Tests
 
             var result = p.Atiende(
                 new DateTimeOffset(2021, 4, 23, 1, 1, 1, 1, new TimeSpan()), //viernes
-                new TimeSpan(14, 0, 0),
-                new TimeSpan(19, 0, 0));
+                new TimeSpan(14, 0, 0));
 
             //assert
 
@@ -163,8 +160,7 @@ namespace Domain.Entities.Tests
 
             var result = p.Atiende(
                 new DateTimeOffset(2021, 4, 23, 1, 1, 1, 1, new TimeSpan()), //viernes
-                new TimeSpan(14, 0, 0),
-                new TimeSpan(15, 0, 0));
+                new TimeSpan(14, 0, 0));
 
             //assert
 
@@ -181,7 +177,7 @@ namespace Domain.Entities.Tests
 
             //act
 
-            p.EncolarPaciente(turno, new TimeSpan(), new TimeSpan());
+            p.EncolarPaciente(turno, new DateTime(), new TimeSpan());
 
             //assert
 
@@ -201,12 +197,13 @@ namespace Domain.Entities.Tests
             var primerTurno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(10, 0, 0), new TimeSpan(10, 30, 0));
             var turnoPaciente = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0), new TimeSpan(9, 30, 0));
             var horaActual = new TimeSpan(9, 47, 0);
+            var fecha = DateTime.Today.Add(horaActual);
 
             var p = EncolarPaciente_ColaVacia(primerTurno);
 
             //act
 
-            p.EncolarPaciente(turnoPaciente, horaActual, TimeSpan.FromMinutes(15));
+            p.EncolarPaciente(turnoPaciente, fecha, TimeSpan.FromMinutes(15));
 
             //assert
 

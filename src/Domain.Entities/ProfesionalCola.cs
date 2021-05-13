@@ -36,7 +36,13 @@ namespace Domain.Entities
         {
             Orden = orden;
 
-            OperationType = Entities.OperationType.Updated;
+            if(!OperationType.HasValue)
+                OperationType = Entities.OperationType.Updated;
+        }
+
+        public void Delete()
+        {
+            OperationType = Entities.OperationType.Deleted;
         }
     }
 }

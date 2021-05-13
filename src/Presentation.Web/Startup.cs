@@ -1,4 +1,4 @@
-using Domain.Core.CqsModule.Register;
+using Domain.Core.CqsModule.Registration;
 using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
 using Domain.Core.Helpers;

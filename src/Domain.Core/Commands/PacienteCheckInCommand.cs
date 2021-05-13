@@ -42,15 +42,18 @@ namespace Domain.Core.Commands
 
             await _unitOfWork.Turnos.UpdateAsync(turno);
 
-            //await _unitOfWork.SaveChangesAsync();
-
             var profesional = await _unitOfWork.Profesionales.GetOneAsync(turno.ProfesionalId);
 
-            profesional.EncolarPaciente(turno, _dateTimeProvider.Ahora().TimeOfDay, TimeSpan.FromMinutes(_options.TiempoDeToleranciaEnMinutos));
+            profesional.EncolarPaciente(turno, _dateTimeProvider.Ahora(), TimeSpan.FromMinutes(_options.TiempoDeToleranciaEnMinutos));
 
             await _unitOfWork.Profesionales.UpdateColaAsync(profesional);
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public Task ValidateAsync(PacienteCheckInCommand command)
+        {
+            return Task.CompletedTask;
         }
     }
 }

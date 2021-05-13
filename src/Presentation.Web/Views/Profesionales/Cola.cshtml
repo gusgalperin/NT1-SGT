@@ -1,38 +1,56 @@
-﻿@model IEnumerable<Domain.Core.Queryes.ObtenerProfesionalColaQueryResult>
+﻿@model Domain.Core.Queryes.ObtenerProfesionalColaQueryResult
 
 @{
     ViewData["Title"] = "Cola";
 }
 
-<h1>Cola</h1>
+<h1>Cola - @Model.Profesional</h1>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Paciente)
+                Turno
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HoraTurno)
+                Paciente
+            </th>
+            <th>
+                Horario llegada
+            </th>
+            <th>
+                Horario turno
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Paciente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HoraTurno)
-            </td>
-            <td>
-                @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Cola)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.TurnoId.ToString(), "Detalle", "Turnos", new { id = item.TurnoId })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Paciente)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HoraLlegada)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HoraTurno)
+                </td>
+                <td>
+                    @Html.ActionLink("Llamar", "Llamar", new { id = item.TurnoId, profesionalId = Model.ProfesionalId })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<br />
+<br />
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

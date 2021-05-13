@@ -30,6 +30,8 @@ namespace Domain.Entities
         public Profesional Profesional { get; private set; }
         public Paciente Paciente { get; private set; }
 
+        public DateTime FechaHoraInicio => Fecha.Add(HoraFin);
+
         public void CheckedIn()
         {
             Estado = TurnoEstado.Encolado;

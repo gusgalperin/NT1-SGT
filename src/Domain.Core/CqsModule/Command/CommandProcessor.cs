@@ -26,6 +26,9 @@ namespace Domain.Core.CqsModule.Command
 
             foreach (var handler in handlers)
             {
+                if (handler is IValidatable<TCommand>)
+                    await ((IValidatable<TCommand>)handler).ValidateAsync(command);
+
                 await handler.HandleAsync(command);
             }
         }
