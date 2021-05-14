@@ -129,26 +129,6 @@ namespace Domain.Entities.Tests
 
         [Theory]
         [DefaultData]
-        public void Atiende_ErrorFechaFin_ShouldReturnFalse(
-            IEnumerable<Especialidad> especialidades)
-        {
-            //arrange
-
-            var p = new Profesional("nombre", "email", "password", especialidades.ToList(), DiaHorario.DefaultTodaLaSemana());
-
-            //act
-
-            var result = p.Atiende(
-                new DateTimeOffset(2021, 4, 23, 1, 1, 1, 1, new TimeSpan()), //viernes
-                new TimeSpan(14, 0, 0));
-
-            //assert
-
-            result.Should().BeFalse();
-        }
-
-        [Theory]
-        [DefaultData]
         public void Atiende_Valid_ShouldReturnTrue(
             IEnumerable<Especialidad> especialidades)
         {

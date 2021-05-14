@@ -8,12 +8,15 @@ using Infrastructure.Data.Repositories;
 using Infrastructure.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Presentation.Web.Views.Login;
 
 namespace Presentation.Web
 {
@@ -28,9 +31,9 @@ namespace Presentation.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions()
+            services
+                .AddOptions()
                 .Configure<TurnoOptions>(Configuration.GetSection(nameof(TurnoOptions)));
-            services.AddControllersWithViews();
 
             services.AddLogging((ILoggingBuilder builder) =>
             {
@@ -38,17 +41,27 @@ namespace Presentation.Web
             });
 
             services
-                .AddAuthentication(options =>
+                .AddAuthentication(AccountController.CookieScheme)
+                .AddCookie(AccountController.CookieScheme, options =>
                 {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                })
-                .AddCookie(x => x.LoginPath = "/Login/Index");
+                    options.AccessDeniedPath = "/account/denied";
+                    options.LoginPath = "/account/login";
+                });
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Strict;
+                options.HttpOnly = HttpOnlyPolicy.None;
+                options.Secure =  CookieSecurePolicy.Always;
+            });
+
             services.AddAuthorization();
 
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DataContext")));
 
             services.AddMvc();
+            services.AddControllersWithViews();
 
             services
                 .AddScoped<IDateTimeProvider, DateTimeProvider>()
@@ -71,15 +84,13 @@ namespace Presentation.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
             }
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            app.UseAuthorization();
+            
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

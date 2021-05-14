@@ -5,6 +5,7 @@ using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
 using Domain.Core.Helpers;
 using Domain.Core.Queryes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.Shared;
 using Presentation.Web.Models.Turnos;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace Presentation.Web.Controllers
 {
+    [Authorize]
     public class TurnosController : Controller
     {
         private readonly IQueryProcessor _queryProcessor;
