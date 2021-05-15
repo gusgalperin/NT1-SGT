@@ -29,7 +29,7 @@ namespace Domain.Entities
             }
 
             Nombre = nombre;
-            Email = email;
+            Email = email.ToLower();
             Password = password;
         }
     }

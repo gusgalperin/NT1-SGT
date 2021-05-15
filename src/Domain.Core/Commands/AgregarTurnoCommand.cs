@@ -1,6 +1,6 @@
-﻿using Domain.Core.CqsModule.Command;
+﻿using Domain.Core.Commands.Validations;
+using Domain.Core.CqsModule.Command;
 using Domain.Core.Data;
-using Domain.Core.Exceptions;
 using Domain.Core.Helpers;
 using Domain.Entities;
 using System;
@@ -8,20 +8,15 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Commands
 {
-    public class AgregarTurnoCommand : ICommand
+    public class AgregarTurnoCommand : _BaseTurnoCommand
     {
         public AgregarTurnoCommand(Guid idPaciente, Guid idProfesional, DateTime fecha, TimeSpan horaInicio)
+            : base(idProfesional, fecha, horaInicio)
         {
             IdPaciente = idPaciente;
-            IdProfesional = idProfesional;
-            Fecha = fecha;
-            HoraInicio = horaInicio;
         }
 
         public Guid IdPaciente { get; }
-        public Guid IdProfesional { get; }
-        public DateTime Fecha { get; }
-        public TimeSpan HoraInicio { get; }
     }
 
     public class AgregarTurnoCommandHandler : ICommandHandler<AgregarTurnoCommand>, IValidatable<AgregarTurnoCommand>
@@ -42,10 +37,10 @@ namespace Domain.Core.Commands
 
         public async Task HandleAsync(AgregarTurnoCommand command)
         {
-            var profesional = await _unitOfWork.Profesionales.GetOneAsync(command.IdProfesional);
+            var profesional = await _unitOfWork.Profesionales.GetOneAsync(command.ProfesionalId);
             var horaFin = command.HoraInicio.Add(profesional.DuracionTurno);
 
-            var turno = new Turno(command.IdProfesional, command.IdPaciente, command.Fecha, command.HoraInicio, horaFin);
+            var turno = new Turno(command.ProfesionalId, command.IdPaciente, command.Fecha, command.HoraInicio, horaFin);
 
             await _unitOfWork.Turnos.AddAsync(turno);
             await _unitOfWork.SaveChangesAsync();
@@ -53,29 +48,9 @@ namespace Domain.Core.Commands
 
         public async Task ValidateAsync(AgregarTurnoCommand command)
         {
-            var horaInicioTurno = command.Fecha.AddHours(command.HoraInicio.TotalHours);
-
-            if (horaInicioTurno <= _dateTimeProvider.Ahora())
-                throw new UserException("La fecha debe ser mayor a 'ahora'");
-
-            await ValidarProfesionalAtiende(command);
-            await ValidarTurnoLibre(command);
-        }
-
-        private async Task ValidarProfesionalAtiende(AgregarTurnoCommand command)
-        {
-            var profesional = await _unitOfWork.Profesionales.GetOneAsync(command.IdProfesional);
-
-            if (!profesional.Atiende(command.Fecha, command.HoraInicio))
-                throw new ProfesionalNoAtiendeException(profesional.Nombre, command.Fecha, command.HoraInicio);
-        }
-
-        private async Task ValidarTurnoLibre(AgregarTurnoCommand command)
-        {
-            var turno = await _unitOfWork.Turnos.BuscarTurnoAsync(command.IdProfesional, command.Fecha, command.HoraInicio);
-
-            if (turno != null)
-                throw new TurnoOcupadoException(command.Fecha, command.HoraInicio);
+            await _commandProcessor.ProcessCommandAsync(new ValidarFechaTurnoEsMayorAHoyCommand(command));
+            await _commandProcessor.ProcessCommandAsync(new ValidarProfesionalAtiendeEnFechaHoraCommand(command));
+            await _commandProcessor.ProcessCommandAsync(new ValidarTurnoEstaLibreCommand(command));
         }
     }
 }

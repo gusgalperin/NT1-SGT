@@ -35,7 +35,7 @@ namespace Domain.Core.Tests.Commands
                 .Callback<Turno>(x => created = x);
 
             profesionalRepoMock
-                .Setup(x => x.GetOneAsync(command.IdProfesional))
+                .Setup(x => x.GetOneAsync(command.ProfesionalId))
                 .ReturnsAsync(profesional);
 
             uowMock
@@ -53,7 +53,7 @@ namespace Domain.Core.Tests.Commands
 
             created.Should().NotBeNull();
             created.Estado.Should().Be(TurnoEstado.Pendiente);
-            created.ProfesionalId.Should().Be(command.IdProfesional);
+            created.ProfesionalId.Should().Be(command.ProfesionalId);
             created.PacienteId.Should().Be(command.IdPaciente);
             created.Fecha.Should().Be(command.Fecha);
             created.HoraInicio.Should().Be(command.HoraInicio);

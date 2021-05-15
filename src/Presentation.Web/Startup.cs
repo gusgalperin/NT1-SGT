@@ -3,10 +3,10 @@ using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
 using Domain.Core.Helpers;
 using Domain.Core.Options;
+using Domain.Core.Security;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Repositories;
 using Infrastructure.Data.UnitOfWork;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Presentation.Web.MIddlewares;
 using Presentation.Web.Views.Login;
 
 namespace Presentation.Web
@@ -52,7 +53,7 @@ namespace Presentation.Web
             {
                 options.MinimumSameSitePolicy = SameSiteMode.Strict;
                 options.HttpOnly = HttpOnlyPolicy.None;
-                options.Secure =  CookieSecurePolicy.Always;
+                options.Secure = CookieSecurePolicy.Always;
             });
 
             services.AddAuthorization();
@@ -69,8 +70,13 @@ namespace Presentation.Web
                 .AddScoped<IPacienteRepository, PacienteRepository>()
                 .AddScoped<IProfesionalRepository, ProfesionalRepository>()
                 .AddScoped<ITurnoRepository, TurnoRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
+
+                .AddScoped<ILoginService, LoginService>()
 
                 .AddScoped<IUnitOfWork, UnitOfWork>()
+
+                .AddScoped<IAuthenticatedUser, AuthenticatedUser>()
 
                 .AddCqsModule();
         }
@@ -88,9 +94,11 @@ namespace Presentation.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<SetAuthenticatedUserMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

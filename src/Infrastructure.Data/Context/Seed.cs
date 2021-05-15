@@ -16,6 +16,7 @@ namespace Infrastructure.Data.Context
 
             hayCambios = hayCambios
                 || await SeedEspecialidadesAsync(context)
+                || await SeedAdminAsync(context)
                 || await SeedProfesionalesAsync(context)
                 || await SeedRecepcionistasAsync(context)
                 || await SeedPacientesAsync(context);
@@ -38,6 +39,16 @@ namespace Infrastructure.Data.Context
                 new Especialidad("Otorrinolaringología"),
                 new Especialidad("Pediatría"),
                 new Especialidad("Cardiología"));
+
+            return true;
+        }
+
+        private async static Task<bool> SeedAdminAsync(DataContext context)
+        {
+            if (await context.Admins.AnyAsync())
+                return false;
+
+            await context.Admins.AddAsync(new Admin("Admin", "admin@sgt.com", "admin"));
 
             return true;
         }

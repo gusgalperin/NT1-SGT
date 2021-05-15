@@ -5,8 +5,7 @@ namespace Domain.Entities
     public class Turno : Entity<Guid>
     {
         protected Turno()
-        {
-        }
+        { }
 
         public Turno(Guid idProfesional, Guid idPaciente, DateTime fecha, TimeSpan horaInicio, TimeSpan horaFin)
             : base(Guid.NewGuid())
@@ -34,16 +33,25 @@ namespace Domain.Entities
 
         public void CheckedIn()
         {
+            if (Estado != TurnoEstado.Pendiente)
+                throw new InvalidOperationException();
+
             Estado = TurnoEstado.Encolado;
         }
 
         public void Atendiendo()
         {
+            if (Estado != TurnoEstado.Encolado)
+                throw new InvalidOperationException();
+
             Estado = TurnoEstado.EnAtencion;
         }
 
         public void FinalizaAtencion()
         {
+            if (Estado != TurnoEstado.EnAtencion)
+                throw new InvalidOperationException();
+
             Estado = TurnoEstado.Finalizado;
         }
     }
@@ -54,7 +62,26 @@ namespace Domain.Entities
         Encolado,
         EnAtencion,
         Finalizado,
-        PacienteAusente,
         Cancelado,
+    }
+
+    public enum TurnoAccion
+    {
+        CheckIn,
+        Llamar,
+        Fin,
+        Cancelar
+    }
+
+    public class TurnoEstadoMachine
+    {
+        private class Transicion
+        {
+            public TurnoEstado EstadoInicial { get; set; }
+            public TurnoAccion EstadoAccion { get; set; }
+            public TurnoEstado EstadoFinal { get; set; }
+        }
+
+
     }
 }

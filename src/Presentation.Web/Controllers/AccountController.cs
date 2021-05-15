@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Domain.Core.Security;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,6 +15,12 @@ namespace Presentation.Web.Views.Login
     public class AccountController : Controller
     {
         public static string CookieScheme = "AuthCookie";
+        private readonly ILoginService _loginService;
+
+        public AccountController(ILoginService loginService)
+        {
+            _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
+        }
 
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
@@ -24,25 +30,19 @@ namespace Presentation.Web.Views.Login
         }
 
         [HttpPost]
-        public async Task<ActionResult> Login(LoginModel model, [FromRoute]string returnUrl = null)
+        public async Task<ActionResult> Login(LoginModel model, [FromRoute] string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            //return RedirectToAction("Index", "Home");
 
-            if (ValidateLogin(model.UserName, model.Password))
+            try
             {
-                //var claims = new List<Claim>
-                //{
-                //    new Claim("user", model.UserName),
-                //    new Claim("role", "Member")
-                //};
-
-                //await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
-
+                var user = await _loginService.LoginAsync(model.UserName, model.Password);
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, model.UserName),
+                    new Claim(ClaimTypes.Name, user.Nombre),
+                    new Claim("Rol", user.Rol.ToString()),
+                    new Claim("Id", user.Id.ToString()),
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -62,13 +62,12 @@ namespace Presentation.Web.Views.Login
                     return RedirectToAction("Index", "Turnos");
                 }
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("ValidationError", ex.Message);
 
-            return View();
-        }
-
-        private bool ValidateLogin(object userName, object password)
-        {
-            return true;
+                return View();
+            }
         }
 
         public IActionResult AccessDenied(string returnUrl = null)

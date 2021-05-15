@@ -34,7 +34,7 @@ namespace Domain.Core.Tests.Commands
                 new List<DiaHorario> { new DiaHorario(hoy.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(18, 0, 0)) });
 
             profesionalRepoMock
-                .Setup(x => x.GetOneAsync(command.IdProfesional))
+                .Setup(x => x.GetOneAsync(command.ProfesionalId))
                 .ReturnsAsync(profesional);
 
             //act
@@ -107,13 +107,13 @@ namespace Domain.Core.Tests.Commands
                 new List<DiaHorario> { new DiaHorario(hoy.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(18, 0, 0)) });
 
             profesionalRepoMock
-                .Setup(x => x.GetOneAsync(command.IdProfesional))
+                .Setup(x => x.GetOneAsync(command.ProfesionalId))
                 .ReturnsAsync(profesional);
 
             var turno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, new TimeSpan(), new TimeSpan());
 
             turnoRepoMock
-                .Setup(x => x.BuscarTurnoAsync(command.IdProfesional, command.Fecha, command.HoraInicio))
+                .Setup(x => x.BuscarTurnoAsync(command.ProfesionalId, command.Fecha, command.HoraInicio))
                 .ReturnsAsync(turno);
 
             //act

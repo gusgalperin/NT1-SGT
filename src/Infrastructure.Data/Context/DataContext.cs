@@ -15,6 +15,7 @@ namespace Infrastructure.Data.Context
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Profesional> Profesionales { get; set; }
         public DbSet<Recepcionista> Recepcionistas { get; set; }
         public DbSet<Paciente> Pacientes { get; set; }

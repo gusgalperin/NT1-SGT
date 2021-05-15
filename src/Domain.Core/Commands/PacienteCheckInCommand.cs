@@ -18,7 +18,7 @@ namespace Domain.Core.Commands
         public Guid TurnoId { get; }
     }
 
-    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>
+    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>, IValidatable<PacienteCheckInCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -51,9 +51,8 @@ namespace Domain.Core.Commands
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task ValidateAsync(PacienteCheckInCommand command)
+        public async Task ValidateAsync(PacienteCheckInCommand command)
         {
-            return Task.CompletedTask;
         }
     }
 }
