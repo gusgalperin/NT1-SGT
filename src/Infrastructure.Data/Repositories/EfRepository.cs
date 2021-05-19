@@ -23,7 +23,9 @@ namespace Infrastructure.Data.Repositories
 
         public async virtual Task AddAsync(TEntity e)
         {
-            await Set.AddAsync(e);
+            
+                await Set.AddAsync(e);
+            
         }
 
         public async virtual Task<IEnumerable<TEntity>> GetAllAsync()

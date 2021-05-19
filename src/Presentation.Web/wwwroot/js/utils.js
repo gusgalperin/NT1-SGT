@@ -42,15 +42,18 @@
             }
         }
 
-        //if (!http_request) {
-        //    alert('Falla :( No es posible crear una instancia XMLHTTP');
-        //    return false;
-        //}
-
         http_request.onreadystatechange = function () {
             if (http_request.readyState == 4) {
                 if (http_request.status == 200) {
-                    onOk(JSON.parse(http_request.response));
+                    let response;
+
+                    try {
+                        response = JSON.parse(http_request.response);
+                    } catch (e) {
+                        response = http_request.response;
+                    }
+
+                    onOk(response);
                 } else {
                     onError();
                 }

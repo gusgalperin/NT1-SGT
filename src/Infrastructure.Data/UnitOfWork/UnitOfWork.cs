@@ -1,6 +1,9 @@
 ﻿using Domain.Core.Data;
 using Domain.Core.Data.Repositories;
+using Domain.Core.Exceptions;
 using Infrastructure.Data.Context;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -30,7 +33,14 @@ namespace Infrastructure.Data.UnitOfWork
 
         public async Task SaveChangesAsync()
         {
-            await _db.SaveChangesAsync();
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException && (sqlException.Number == 2627 || sqlException.Number == 2601))
+            {
+                throw new DuplicateEntityException();
+            }
         }
     }
 }

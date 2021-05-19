@@ -42,12 +42,5 @@ namespace Presentation.Web.Controllers
 
             return View(cola);
         }
-
-        public async Task<IActionResult> Llamar(Guid id, Guid profesionalId)
-        {
-            await _commandProcessor.ProcessCommandAsync(new LlamarPacienteCommand(id));
-
-            return RedirectToAction("Cola", profesionalId);
-        }
     }
 }

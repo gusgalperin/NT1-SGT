@@ -5,6 +5,7 @@ using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
 using Domain.Core.Helpers;
 using Domain.Core.Queryes;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.Shared;
@@ -82,6 +83,13 @@ namespace Presentation.Web.Controllers
             return RedirectToAction("Index", fecha);
         }
 
+        public async Task<IActionResult> EjecutarAccion(Guid turnoId, TurnoAccion accion)
+        {
+            await _commandProcessor.ProcessCommandAsync(new EjecutarAccionSobreTurnoResolverCommand(turnoId, accion));
+
+            return RedirectToAction("Detalle", new { id = turnoId });
+        }
+
         public async Task<IActionResult> Detalle(Guid id)
         {
             var e = await _turnoRepository.GetOneAsync(id);
@@ -123,6 +131,25 @@ namespace Presentation.Web.Controllers
             }
 
             return listaHorarios;
+        }
+
+        public IActionResult CrearPaciente()
+        {
+            return PartialView("_CrearPaciente", new Models.Pacientes.Nuevo { FechaNacmiento = DateTime.Now});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearPaciente(Models.Pacientes.Nuevo model)
+        {
+            if (ModelState.IsValid)
+            {
+                var paciente = await _commandProcessor.ProcessCommandAsync<CrearPacienteCommand, Paciente>(
+                    new CrearPacienteCommand(model.Dni, model.Nombre, model.FechaNacmiento));
+
+                model.SetId(paciente.Id);
+            }
+
+            return PartialView("_CrearPaciente", model);
         }
     }
 }

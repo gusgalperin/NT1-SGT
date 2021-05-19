@@ -89,10 +89,10 @@ namespace Infrastructure.Data.Context
             var hoy = DateTime.Today;
 
             await context.Pacientes.AddRangeAsync(
-                new Paciente("Pedro Convaleciente", "1234567", hoy, hoy),
-                new Paciente("Laura Perdida", "14857987", hoy, hoy),
-                new Paciente("Juan Roto", "33123411", hoy, hoy),
-                new Paciente("Lucas Dolido", "9999999", hoy, hoy));
+                new Paciente("Pedro Convaleciente", "1234567", hoy),
+                new Paciente("Laura Perdida", "14857987", hoy),
+                new Paciente("Juan Roto", "33123411", hoy),
+                new Paciente("Lucas Dolido", "9999999", hoy));
 
             return true;
         }

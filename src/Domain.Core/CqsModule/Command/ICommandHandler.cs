@@ -7,4 +7,10 @@ namespace Domain.Core.CqsModule.Command
     {
         Task HandleAsync(TCommand command);
     }
+
+    public interface ICommandHandler<TCommand, TReturn>
+        where TCommand : ICommand
+    {
+        Task<TReturn> HandleAsync(TCommand command);
+    }
 }

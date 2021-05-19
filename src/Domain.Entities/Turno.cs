@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities
 {
@@ -26,34 +27,20 @@ namespace Domain.Entities
         public TimeSpan HoraFin { get; private set; }
         public TurnoEstado Estado { get; private set; }
 
+        public DateTime FullFecha => Fecha.Add(HoraInicio);
+
         public Profesional Profesional { get; private set; }
         public Paciente Paciente { get; private set; }
 
         public DateTime FechaHoraInicio => Fecha.Add(HoraFin);
 
-        public void CheckedIn()
-        {
-            if (Estado != TurnoEstado.Pendiente)
-                throw new InvalidOperationException();
+        public IEnumerable<TurnoAccion> AccionesPosibles => TurnoEstadoMachine.ObtenerPosiblesAcciones(Estado);
 
-            Estado = TurnoEstado.Encolado;
-        }
+        public void CambiarEstado(TurnoAccion accion)
+            => Estado = TurnoEstadoMachine.ObtenerProximoEstado(Estado, accion);
 
-        public void Atendiendo()
-        {
-            if (Estado != TurnoEstado.Encolado)
-                throw new InvalidOperationException();
-
-            Estado = TurnoEstado.EnAtencion;
-        }
-
-        public void FinalizaAtencion()
-        {
-            if (Estado != TurnoEstado.EnAtencion)
-                throw new InvalidOperationException();
-
-            Estado = TurnoEstado.Finalizado;
-        }
+        public bool SePuede(TurnoAccion accion)
+            => TurnoEstadoMachine.TransicionPosible(Estado, accion);
     }
 
     public enum TurnoEstado
@@ -67,21 +54,16 @@ namespace Domain.Entities
 
     public enum TurnoAccion
     {
+        [NiceString("Check-In")]
         CheckIn,
+        
+        [NiceString("Llamar")]
         Llamar,
+        
+        [NiceString("Fin de atención")]
         Fin,
+        
+        [NiceString("Cancelar")]
         Cancelar
-    }
-
-    public class TurnoEstadoMachine
-    {
-        private class Transicion
-        {
-            public TurnoEstado EstadoInicial { get; set; }
-            public TurnoAccion EstadoAccion { get; set; }
-            public TurnoEstado EstadoFinal { get; set; }
-        }
-
-
     }
 }

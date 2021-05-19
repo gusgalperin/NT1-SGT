@@ -1,4 +1,5 @@
 ﻿using Domain.Core.Commands.Internals;
+using Domain.Core.Commands.Validations;
 using Domain.Core.CqsModule.Command;
 using Domain.Core.Data;
 using System;
@@ -6,24 +7,24 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Commands
 {
-    public class LlamarPacienteCommand : ICommand, ITurnoAccionable
+    public class CancelarTurnoCommand : ICommand, ITurnoAccionable
     {
-        public LlamarPacienteCommand(Guid turnoId)
+        public CancelarTurnoCommand(Guid turnoId)
         {
             TurnoId = turnoId;
         }
 
         public Guid TurnoId { get; }
 
-        public Entities.TurnoAccion Accion => Entities.TurnoAccion.Llamar;
+        public Entities.TurnoAccion Accion => Entities.TurnoAccion.Cancelar;
     }
 
-    public class LlamarPacienteCommandHandler : ICommandHandler<LlamarPacienteCommand>
+    public class CancelarTurnoCommandHandler : ICommandHandler<CancelarTurnoCommand>, IValidatable<CancelarTurnoCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICommandProcessor _commandProcessor;
 
-        public LlamarPacienteCommandHandler(
+        public CancelarTurnoCommandHandler(
             IUnitOfWork unitOfWork,
             ICommandProcessor commandProcessor)
         {
@@ -31,23 +32,29 @@ namespace Domain.Core.Commands
             _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
         }
 
-        public async Task HandleAsync(LlamarPacienteCommand command)
+        public async Task HandleAsync(CancelarTurnoCommand command)
         {
             var turno = await _unitOfWork.Turnos.GetOneAsync(command.TurnoId);
+
+            var turnoEncolado = turno.Estado == Entities.TurnoEstado.Encolado;
 
             await _commandProcessor.ProcessCommandAsync(
                 CambiarEstadoTurnoCommand.FromCommand(command, turno));
 
-            turno.Profesional.DesencolarPaciente(command.TurnoId);
+            if (turnoEncolado)
+            {
+                turno.Profesional.DesencolarPaciente(command.TurnoId);
 
-            await _unitOfWork.Profesionales.UpdateColaAsync(turno.Profesional);
+                await _unitOfWork.Profesionales.UpdateColaAsync(turno.Profesional);
+            }
 
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public Task ValidateAsync(LlamarPacienteCommand command)
+        public async Task ValidateAsync(CancelarTurnoCommand command)
         {
-            return Task.CompletedTask;
+            await _commandProcessor.ProcessCommandAsync(new ValidarCancelarTurnoCommand(
+                await _unitOfWork.Turnos.GetOneAsync(command.TurnoId)));
         }
     }
 }

@@ -7,10 +7,69 @@
         utils.initSelect2(document.getElementById('slPacientes'), '/turnos/pacientes');
 
         const selectProfesionales = document.getElementById('slProfesionales');
-
         selectProfesionales.addEventListener('change', (event) => {
             this.profesionalChange(event.target.value);
         });
+
+        let btnCrearPaciente = document.getElementById("btnCrearPaciente");
+        btnCrearPaciente.addEventListener('click', (event) => {
+            this.nuevoPacienteClick(btnCrearPaciente);
+        });
+    }
+
+    nuevoPacienteClick(btnCrearPaciente) {
+        var url = btnCrearPaciente.dataset.url;
+
+        var _this = this;
+
+        utils.get(
+            url,
+            (data) => { _this.abrirNuevoPacienteModal(data) },
+            (error) => { alert(error)}
+        )
+    }
+
+    abrirNuevoPacienteModal(data) {
+        $('#modal-placeholder').html('');
+        $('#modal-placeholder').html(data);
+        $('#modal-placeholder > .modal').modal('show');
+
+        this.initModal();
+    }
+
+    initModal() {
+        let placeholderElement = document.getElementById('modal-placeholder');
+
+        var $placeholder = $(placeholderElement);
+
+        var _this = this;
+
+        $placeholder.on('click', '[data-save="modal"]', function (event) {
+            event.preventDefault();
+
+            var form = $(this).parents('.modal').find('form');
+            var actionUrl = form.attr('action');
+            var dataToSend = form.serialize();
+
+            $.post(actionUrl, dataToSend).done(function (data) {
+                var newBody = $('.modal-body', data);
+                $placeholder.find('.modal-body').replaceWith(newBody);
+
+                var isValid = newBody.find('[name="IsValid"]').val() == 'True';
+                if (isValid) {
+                    $placeholder.find('.modal').modal('hide');
+
+                    var pacienteId = newBody.find('[name="Id"]').val();
+                    var pacienteNombre = newBody.find('[name="Nombre"]').val();
+                    _this.seleccionarPacienteRecienCreado(pacienteId, pacienteNombre);
+                }
+            });
+        });
+    }
+
+    seleccionarPacienteRecienCreado(id, nombre) {
+        var newOption = new Option(nombre, id, true, true);
+        $('#slPacientes').append(newOption).trigger('change');
     }
 
     profesionalChange(event) {

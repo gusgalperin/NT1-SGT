@@ -1,4 +1,5 @@
 ﻿@model Domain.Entities.Turno
+@using Domain.Entities;
 
 @{
     ViewData["Title"] = "Detalle";
@@ -52,11 +53,13 @@
 <br />
 
 <div>
-    @if (Model.Estado == Domain.Entities.TurnoEstado.Pendiente)
+
+    @foreach (var accion in Model.AccionesPosibles)
     {
-        @Html.ActionLink("Check-in", "CheckIn", new { turnoId = Model.Id, fecha = Model.Fecha })
+        @Html.ActionLink(accion.ToNiceString(), "EjecutarAccion", new { turnoId = Model.Id, accion = accion }, new { @class="btn btn-primary" })
     }
 
+    <br />
     <br />
 
     <a asp-action="Index">Back to List</a>

@@ -6,7 +6,8 @@ namespace Domain.Entities
     public class Paciente : Entity<Guid>
     {
         protected Paciente () { }
-        public Paciente(string nombre, string dni, DateTime fechaNacimiento, DateTime fechaAlta)
+
+        public Paciente(string nombre, string dni, DateTime fechaNacimiento)
             : base(Guid.NewGuid())
         {
             if (string.IsNullOrEmpty(nombre))
@@ -22,7 +23,7 @@ namespace Domain.Entities
             Nombre = nombre;
             Dni = dni;
             FechaNacimiento = fechaNacimiento;
-            FechaAlta = fechaAlta;
+            FechaAlta = DateTime.Now;
         }
 
         public string Nombre { get; private set; }

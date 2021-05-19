@@ -1,4 +1,6 @@
-﻿using Domain.Core.CqsModule.Command;
+﻿using Domain.Core.Commands.Internals;
+using Domain.Core.Commands.Validations;
+using Domain.Core.CqsModule.Command;
 using Domain.Core.Data;
 using Domain.Core.Helpers;
 using Domain.Core.Options;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Commands
 {
-    public class PacienteCheckInCommand : ICommand
+    public class PacienteCheckInCommand : ICommand, ITurnoAccionable
     {
         public PacienteCheckInCommand(Guid turnoId)
         {
@@ -16,19 +18,24 @@ namespace Domain.Core.Commands
         }
 
         public Guid TurnoId { get; }
+
+        public Entities.TurnoAccion Accion => Entities.TurnoAccion.CheckIn;
     }
 
-    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>, IValidatable<PacienteCheckInCommand>
+    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>
     {
+        private readonly ICommandProcessor _commandProcessor;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly TurnoOptions _options;
 
         public PacienteCheckInCommandHandler(
+            ICommandProcessor commandProcessor,
             IUnitOfWork unitOfWork,
             IDateTimeProvider dateTimeProvider,
             IOptions<TurnoOptions> options)
         {
+            _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -38,9 +45,8 @@ namespace Domain.Core.Commands
         {
             var turno = await _unitOfWork.Turnos.GetOneAsync(command.TurnoId);
 
-            turno.CheckedIn();
-
-            await _unitOfWork.Turnos.UpdateAsync(turno);
+            await _commandProcessor.ProcessCommandAsync(
+                CambiarEstadoTurnoCommand.FromCommand(command, turno));
 
             var profesional = await _unitOfWork.Profesionales.GetOneAsync(turno.ProfesionalId);
 
@@ -49,10 +55,6 @@ namespace Domain.Core.Commands
             await _unitOfWork.Profesionales.UpdateColaAsync(profesional);
 
             await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task ValidateAsync(PacienteCheckInCommand command)
-        {
         }
     }
 }

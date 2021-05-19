@@ -8,6 +8,9 @@ namespace Domain.Core.CqsModule.Command
     {
         Task ProcessCommandAsync<TCommand>(TCommand command) 
             where TCommand : ICommand;
+
+        Task<TReturn> ProcessCommandAsync<TCommand, TReturn>(TCommand command)
+             where TCommand : ICommand;
     }
 
     public class CommandProcessor : ICommandProcessor
@@ -31,6 +34,22 @@ namespace Domain.Core.CqsModule.Command
 
                 await handler.HandleAsync(command);
             }
+        }
+
+        public async Task<TReturn> ProcessCommandAsync<TCommand, TReturn>(TCommand command)
+            where TCommand : ICommand
+        {
+            var handlers = _serviceProvider.GetServices<ICommandHandler<TCommand, TReturn>>();
+
+            foreach (var handler in handlers)
+            {
+                if (handler is IValidatable<TCommand>)
+                    await ((IValidatable<TCommand>)handler).ValidateAsync(command);
+
+                return await handler.HandleAsync(command);
+            }
+
+            throw new InvalidOperationException();
         }
     }
 }

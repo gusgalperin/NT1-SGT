@@ -87,6 +87,10 @@ namespace Infrastructure.Data.Context
                .IsRequired();
 
             builder.Entity<Paciente>()
+                .HasIndex(i => i.Dni)
+                .IsUnique();
+
+            builder.Entity<Paciente>()
                 .Property(p => p.FechaAlta)
                 .IsRequired();
 

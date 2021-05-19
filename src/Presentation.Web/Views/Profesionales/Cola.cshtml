@@ -40,9 +40,6 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.HoraTurno)
                 </td>
-                <td>
-                    @Html.ActionLink("Llamar", "Llamar", new { id = item.TurnoId, profesionalId = Model.ProfesionalId })
-                </td>
             </tr>
         }
     </tbody>
