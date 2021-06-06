@@ -20,6 +20,9 @@ namespace Infrastructure.Data.Repositories
             return (await _db.Usuarios
                 .Where(x => x.Email == email.ToLower())
                 .Where(x => x.Password == password)
+                .Include(x => x.Rol)
+                .Include(x => x.Rol.Permisos)
+                .Include("Rol.Permisos.Permiso")
                 .FirstOrDefaultAsync()) ?? throw new EntityNotFoundException<Usuario>(email);
         }
     }

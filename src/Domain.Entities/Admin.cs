@@ -5,7 +5,7 @@
         protected Admin() { }
 
         public Admin(string nombre, string email, string password)
-            : base(nombre, email, password)
+            : base(Rol.Admin(), nombre, email, password)
         { }
     }
 }

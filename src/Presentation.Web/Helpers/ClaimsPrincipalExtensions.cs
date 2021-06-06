@@ -1,5 +1,7 @@
 ﻿using Domain.Core.Security;
+using Domain.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
@@ -18,9 +20,14 @@ namespace Presentation.Web
             return user.Claim("Rol");
         }
 
-        public static RolType RolAsEnum(this ClaimsPrincipal user)
+        public static Rol.Options RolAsEnum(this ClaimsPrincipal user)
         {
-            return (RolType) Enum.Parse(typeof(RolType), user.Claim("Rol"));
+            return (Rol.Options) Enum.Parse(typeof(RolType), user.Rol());
+        }
+
+        public static IEnumerable<string> Persmisos(this ClaimsPrincipal user)
+        {
+            return user.Claim("Permisos").Split("|").ToList();
         }
     }
 }

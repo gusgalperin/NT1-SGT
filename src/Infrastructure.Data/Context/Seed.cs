@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +20,8 @@ namespace Infrastructure.Data.Context
                 || await SeedAdminAsync(context)
                 || await SeedProfesionalesAsync(context)
                 || await SeedRecepcionistasAsync(context)
-                || await SeedPacientesAsync(context);
+                || await SeedPacientesAsync(context)
+                || await SeedRolesPermisosAsync(context);
 
             if (hayCambios)
                 await context.SaveChangesAsync();
@@ -93,6 +95,34 @@ namespace Infrastructure.Data.Context
                 new Paciente("Laura Perdida", "14857987", hoy),
                 new Paciente("Juan Roto", "33123411", hoy),
                 new Paciente("Lucas Dolido", "9999999", hoy));
+
+            return true;
+        }
+
+        private async static Task<bool> SeedRolesPermisosAsync(DataContext context)
+        {
+            if (await context.Roles.AnyAsync())
+                return false;
+
+            var permisoCancelarTurno = new Permiso("turno.cancelar");
+
+            var permisosProfesional = new List<Permiso> { 
+                new Permiso("turno.llamar"),
+                new Permiso("turno.fin"),
+                permisoCancelarTurno
+            };
+
+            var permisosRecepcionista = new List<Permiso> {
+                new Permiso("turno.checkin"),
+                permisoCancelarTurno
+            };
+
+            await context.Permisos.AddRangeAsync(permisosProfesional.Concat(permisosRecepcionista));
+
+            await context.Roles.AddRangeAsync(
+                Rol.Recepcionista(permisosRecepcionista),
+                Rol.Admin(),
+                Rol.Profesional(permisosProfesional));
 
             return true;
         }

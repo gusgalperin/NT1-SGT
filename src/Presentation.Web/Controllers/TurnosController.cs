@@ -92,9 +92,9 @@ namespace Presentation.Web.Controllers
 
         public async Task<IActionResult> Detalle(Guid id)
         {
-            var e = await _turnoRepository.GetOneAsync(id);
+            var turno = await _queryProcessor.ProcessQueryAsync<ObtenerTurnoQuery, ObtenerTurnoQueryResult>(new ObtenerTurnoQuery(id));
 
-            return View(e);
+            return View(turno);
         }
 
         [HttpGet]

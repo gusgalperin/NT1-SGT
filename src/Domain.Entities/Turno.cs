@@ -34,7 +34,8 @@ namespace Domain.Entities
 
         public DateTime FechaHoraInicio => Fecha.Add(HoraFin);
 
-        public IEnumerable<TurnoAccion> AccionesPosibles => TurnoEstadoMachine.ObtenerPosiblesAcciones(Estado);
+        public IEnumerable<TurnoAccion> AccionesPosibles 
+            => TurnoEstadoMachine.ObtenerPosiblesAcciones(Estado);
 
         public void CambiarEstado(TurnoAccion accion)
             => Estado = TurnoEstadoMachine.ObtenerProximoEstado(Estado, accion);
@@ -55,15 +56,19 @@ namespace Domain.Entities
     public enum TurnoAccion
     {
         [NiceString("Check-In")]
+        [RequierePermiso("turno.checkin")]
         CheckIn,
         
         [NiceString("Llamar")]
+        [RequierePermiso("turno.llamar")]
         Llamar,
         
         [NiceString("Fin de atención")]
+        [RequierePermiso("turno.fin")]
         Fin,
         
         [NiceString("Cancelar")]
+        [RequierePermiso("turno.cancelar")]
         Cancelar
     }
 }

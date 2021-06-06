@@ -19,7 +19,7 @@ namespace Domain.Core.Commands
         public Guid IdPaciente { get; }
     }
 
-    public class AgregarTurnoCommandHandler : ICommandHandler<AgregarTurnoCommand>, IValidatable<AgregarTurnoCommand>
+    public class AgregarTurnoCommandHandler : ICommandHandler<AgregarTurnoCommand>, IValidatable<AgregarTurnoCommand>, ISecuredCommand
     {
         private readonly ICommandProcessor _commandProcessor;
         private readonly IUnitOfWork _unitOfWork;
@@ -34,6 +34,8 @@ namespace Domain.Core.Commands
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
+
+        public string PermisoRequerido => Permiso.CrearTurno;
 
         public async Task HandleAsync(AgregarTurnoCommand command)
         {

@@ -1,6 +1,7 @@
 ﻿using Domain.Core.Data.Repositories;
 using Domain.Core.Exceptions;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Domain.Core.Security
@@ -24,7 +25,14 @@ namespace Domain.Core.Security
             try
             {
                 var user = await _userRepository.LoginAsync(email, password);
-                return new UserInfo { Id = user.Id, Nombre = user.Nombre, Rol = user.Rol() };
+
+                return new UserInfo
+                {
+                    Id = user.Id,
+                    Nombre = user.Nombre,
+                    Rol = user.Rol.Descripcion,
+                    Permisos = user.Rol.Permisos.Select(x => x.Permiso.Id).ToList()
+                };
             }
             catch (EntityNotFoundException)
             {

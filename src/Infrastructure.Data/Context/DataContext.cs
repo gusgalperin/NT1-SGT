@@ -23,6 +23,8 @@ namespace Infrastructure.Data.Context
         public DbSet<ProfesionalCola> Colas { get; set; }
         public DbSet<Turno> Turnos { get; set; }
         public DbSet<DiaHorario> Horarios { get; set; }
+        public DbSet<Rol> Roles { get; set; }
+        public DbSet<Permiso> Permisos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
@@ -40,6 +42,7 @@ namespace Infrastructure.Data.Context
             BuildEspecialidad(builder);
             BuildProfesional(builder);
             BuildTurno(builder);
+            BuildRol(builder);
         }
 
         private void BuildTables(ModelBuilder builder)
@@ -51,6 +54,8 @@ namespace Infrastructure.Data.Context
             builder.Entity<Turno>().ToTable("Turno").HasKey(x => x.Id);
             builder.Entity<DiaHorario>().ToTable("Horario").HasKey(x => x.Id);
             builder.Entity<ProfesionalEspecialidad>().ToTable("ProfesionalEspecialidad");
+            builder.Entity<Rol>().ToTable("Rol");
+            builder.Entity<Permiso>().ToTable("Permiso");
         }
 
         private void BuildEspecialidad(ModelBuilder builder)
@@ -77,6 +82,9 @@ namespace Infrastructure.Data.Context
                .Property(p => p.Password)
                .HasMaxLength(80)
                .IsRequired();
+
+            builder.Entity<Usuario>()
+                .HasOne(x => x.Rol);
         }
 
         private void BuildPaciente(ModelBuilder builder)
@@ -139,6 +147,23 @@ namespace Infrastructure.Data.Context
             builder.Entity<Turno>()
                 .Property(p => p.Fecha)
                 .HasColumnType("date");
+        }
+
+        private void BuildRol(ModelBuilder builder)
+        {
+            builder.Entity<Rol>()
+                .HasMany(x => x.Permisos)
+                .WithOne(x => x.Rol)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RolPermiso>()
+                .HasKey(x => new { x.RolId, x.PermisoId });
+
+            builder.Entity<RolPermiso>(b =>
+            {
+                b.HasOne(x => x.Rol).WithMany(x => x.Permisos).OnDelete(DeleteBehavior.Restrict);
+                //b.HasOne(x => x.Especialidad).WithMany(x => x.Profesionales).OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }

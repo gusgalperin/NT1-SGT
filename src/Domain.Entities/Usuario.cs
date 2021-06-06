@@ -8,9 +8,12 @@ namespace Domain.Entities
         public string Email { get; private set; }
         public string Password { get; private set; }
 
+        public string RolId { get; private set; }
+        public Rol Rol { get; private set; }
+
         protected Usuario() { }
 
-        public Usuario(string nombre, string email, string password)
+        public Usuario(Rol rol, string nombre, string email, string password)
             : base (Guid.NewGuid())
         {
             if (string.IsNullOrEmpty(nombre))
@@ -28,6 +31,7 @@ namespace Domain.Entities
                 throw new ArgumentException($"'{nameof(password)}' cannot be null or empty.", nameof(password));
             }
 
+            Rol = rol;
             Nombre = nombre;
             Email = email.ToLower();
             Password = password;

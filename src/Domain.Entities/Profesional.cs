@@ -16,7 +16,7 @@ namespace Domain.Entities
         protected Profesional() { }
 
         public Profesional(string nombre, string email, string password, IEnumerable<Especialidad> especialidades, ICollection<DiaHorario> diasQueAtiende)
-            : base (nombre, email, password)
+            : base (Rol.Profesional(), nombre, email, password)
         {
             if (especialidades == null || !especialidades.Any())
             {

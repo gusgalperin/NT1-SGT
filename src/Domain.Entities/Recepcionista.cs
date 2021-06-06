@@ -5,7 +5,7 @@
         protected Recepcionista() { }
 
         public Recepcionista(string nombre, string email, string password) 
-            : base(nombre, email, password)
+            : base(Rol.Recepcionista(), nombre, email, password)
         { }
     }
 }

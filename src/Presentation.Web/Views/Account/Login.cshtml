@@ -11,7 +11,7 @@
         <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.ValidationMessage("ValidationError", new Dictionary<string, string> { { "class", "text-danger" } })
-            
+
             <div class="form-group">
                 <label asp-for="UserName" class="control-label"></label>
                 <input asp-for="UserName" class="form-control" />
@@ -23,10 +23,50 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Login" class="btn btn-primary" />
             </div>
         </form>
     </div>
+</div>
+
+<br />
+<br />
+<br />
+
+<div class="row">Esto está para facilitar las prubas</div>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Rol
+                </th>
+                <th>
+                    User
+                </th>
+                <th>
+                    Password
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Usuarios)
+            {
+                <tr>
+                    <td>
+                        @item.RolId
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>
+                    <td>
+                        @item.Password
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 @section Scripts {

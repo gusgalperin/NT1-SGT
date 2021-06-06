@@ -27,6 +27,7 @@ namespace Presentation.Web.MIddlewares
                     Id = Guid.Parse(context.User.Claim("Id")),
                     Nombre = context.User.Claim(ClaimTypes.Name),
                     Rol = context.User.RolAsEnum(),
+                    Permisos = context.User.Persmisos()
                 };
             }
 

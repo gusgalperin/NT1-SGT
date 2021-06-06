@@ -1,4 +1,5 @@
-﻿using Domain.Core.Security;
+﻿using Domain.Core.Data.Repositories;
+using Domain.Core.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -16,16 +18,26 @@ namespace Presentation.Web.Views.Login
     {
         public static string CookieScheme = "AuthCookie";
         private readonly ILoginService _loginService;
+        private readonly IUserRepository _userRepository;
 
-        public AccountController(ILoginService loginService)
+        public AccountController(
+            ILoginService loginService,
+            IUserRepository userRepository)
         {
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         [AllowAnonymous]
-        public IActionResult Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+
+            var usuarios = (await _userRepository.GetAllAsync())
+                .OrderBy(x => x.RolId);
+
+            ViewBag.Usuarios = usuarios;
+
             return View();
         }
 
@@ -43,6 +55,7 @@ namespace Presentation.Web.Views.Login
                     new Claim(ClaimTypes.Name, user.Nombre),
                     new Claim("Rol", user.Rol.ToString()),
                     new Claim("Id", user.Id.ToString()),
+                    new Claim("Permisos", string.Join("|", user.Permisos))
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

@@ -4,6 +4,7 @@ using Domain.Core.CqsModule.Command;
 using Domain.Core.Data;
 using Domain.Core.Helpers;
 using Domain.Core.Options;
+using Domain.Entities;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
@@ -19,10 +20,10 @@ namespace Domain.Core.Commands
 
         public Guid TurnoId { get; }
 
-        public Entities.TurnoAccion Accion => Entities.TurnoAccion.CheckIn;
+        public TurnoAccion Accion => TurnoAccion.CheckIn;
     }
 
-    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>
+    public class PacienteCheckInCommandHandler : ICommandHandler<PacienteCheckInCommand>, ISecuredCommand
     {
         private readonly ICommandProcessor _commandProcessor;
         private readonly IUnitOfWork _unitOfWork;
@@ -40,6 +41,8 @@ namespace Domain.Core.Commands
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
+
+        public string PermisoRequerido => Permiso.CheckinTurno;
 
         public async Task HandleAsync(PacienteCheckInCommand command)
         {

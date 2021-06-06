@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using System;
+using System.Collections.Generic;
 
 namespace Domain.Core.Security
 {
@@ -7,7 +8,8 @@ namespace Domain.Core.Security
     {
         public Guid Id { get; set; }
         public string Nombre { get; set; }
-        public RolType Rol { get; set; }
+        public Rol.Options Rol { get; set; }
+        public IEnumerable<string> Permisos { get; set; }
     }
 
     public enum RolType
