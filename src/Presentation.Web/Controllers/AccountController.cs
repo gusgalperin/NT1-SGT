@@ -72,7 +72,18 @@ namespace Presentation.Web.Views.Login
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Turnos");
+                    switch (user.Rol)
+                    {
+                        case Domain.Entities.Rol.Options.Profesional:
+                            return RedirectToAction("Index", "Profesionales");
+
+                        case Domain.Entities.Rol.Options.Recepcionista:
+                            return RedirectToAction("Index", "Turnos");
+
+                        default:
+                            return RedirectToAction("Index", "Home");
+                    }
+                    
                 }
             }
             catch (Exception ex)

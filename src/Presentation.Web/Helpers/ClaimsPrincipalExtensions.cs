@@ -29,5 +29,10 @@ namespace Presentation.Web
         {
             return user.Claim("Permisos").Split("|").ToList();
         }
+
+        public static bool Puede(this ClaimsPrincipal user, string permiso)
+        {
+            return user.Persmisos().Contains(permiso);
+        }
     }
 }

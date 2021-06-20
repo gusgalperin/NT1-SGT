@@ -15,7 +15,11 @@
 
         <input type="submit" value="Buscar" class="btn btn-primary" />
 
-        <a asp-action="Nuevo" class="btn btn-primary">Crear nuevo</a>
+        @if (User.Puede(Domain.Entities.Permiso.CrearTurno)) 
+        {
+            <a asp-action="Nuevo" class="btn btn-primary">Crear nuevo</a>
+        }
+
     </form>
 
 </div>
@@ -56,7 +60,10 @@
                 @Html.DisplayFor(modelItem => item.Estado)
             </td>
             <td>
-                @Html.ActionLink("Detalle", "Detalle", new { id = item.TurnoId })
+                @if (User.Puede(Domain.Entities.Permiso.VerDetalleTurno))
+                {
+                    @Html.ActionLink("Detalle", "Detalle", new { id = item.TurnoId })
+                }
             </td>
         </tr>
 }

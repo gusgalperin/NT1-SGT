@@ -1,5 +1,6 @@
 ﻿using Domain.Core.CqsModule.Query;
 using Domain.Core.Data.Repositories;
+using Domain.Core.Security;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -47,16 +48,22 @@ namespace Domain.Core.Queryes
     public class ObtenerAgendaDelDiaQueryHandler : IQueryHandler<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>
     {
         private readonly ITurnoRepository _turnoRepository;
+        private readonly IAuthenticatedUser _authenticatedUser;
 
         public ObtenerAgendaDelDiaQueryHandler(
-            ITurnoRepository turnoRepository)
+            ITurnoRepository turnoRepository,
+            IAuthenticatedUser authenticatedUser)
         {
             _turnoRepository = turnoRepository ?? throw new ArgumentNullException(nameof(turnoRepository));
+            _authenticatedUser = authenticatedUser ?? throw new ArgumentNullException(nameof(authenticatedUser));
         }
 
         public async Task<ObtenerAgendaDelDiaResult> ExecuteAsync(ObtenerAgendaDelDiaQuery query)
         {
             var turnos = (await _turnoRepository.GetAllAsync(query.Fecha))
+                .Where(
+                    !_authenticatedUser.Puede(Permiso.VerTodosTurno), 
+                    x => x.ProfesionalId == _authenticatedUser.UserInfo.Id)
                 .OrderBy(x => x.HoraInicio)
                 .ToList();
 

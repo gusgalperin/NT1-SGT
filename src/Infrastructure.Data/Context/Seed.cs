@@ -104,17 +104,28 @@ namespace Infrastructure.Data.Context
             if (await context.Roles.AnyAsync())
                 return false;
 
-            var permisoCancelarTurno = new Permiso("turno.cancelar");
+            var permisoCancelarTurno = new Permiso(Permiso.CancerlarTurno);
+            var permisoLlamarTurno = new Permiso(Permiso.LlamarTurno);
+            var permisoFinTurno = new Permiso(Permiso.FinTurno);
+            var permisoCheckInTurno = new Permiso(Permiso.CheckinTurno);
+            var permisoVerDetalleTurno = new Permiso(Permiso.VerDetalleTurno);
+            var permisoVerTodosTurno = new Permiso(Permiso.VerTodosTurno);
+            var permisoCrearTurno = new Permiso(Permiso.CrearTurno);
 
-            var permisosProfesional = new List<Permiso> { 
-                new Permiso("turno.llamar"),
-                new Permiso("turno.fin"),
-                permisoCancelarTurno
+            var permisosProfesional = new List<Permiso> {
+                permisoLlamarTurno,
+                permisoFinTurno,
+                permisoCancelarTurno,
+                permisoVerDetalleTurno,
+                permisoCrearTurno
             };
 
             var permisosRecepcionista = new List<Permiso> {
-                new Permiso("turno.checkin"),
-                permisoCancelarTurno
+                permisoCheckInTurno,
+                permisoCancelarTurno,
+                permisoVerDetalleTurno,
+                permisoVerTodosTurno,
+                permisoCrearTurno
             };
 
             await context.Permisos.AddRangeAsync(permisosProfesional.Concat(permisosRecepcionista));

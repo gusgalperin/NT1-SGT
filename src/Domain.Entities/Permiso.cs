@@ -12,6 +12,8 @@
 
         //turnos
         public static string CrearTurno => "turno.crear";
+        public static string VerDetalleTurno => "turno.ver.detalle";
+        public static string VerTodosTurno => "turno.ver.todos";
 
         public static string CancerlarTurno => "turno.cancelar";
         public static string LlamarTurno => "turno.llamar";
