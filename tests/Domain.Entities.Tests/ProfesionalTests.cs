@@ -174,8 +174,8 @@ namespace Domain.Entities.Tests
         {
             //arrange
 
-            var primerTurno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(10, 0, 0), new TimeSpan(10, 30, 0));
-            var turnoPaciente = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0), new TimeSpan(9, 30, 0));
+            var primerTurno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(10, 0, 0), new TimeSpan(10, 30, 0), Guid.NewGuid());
+            var turnoPaciente = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Today, new TimeSpan(9, 0, 0), new TimeSpan(9, 30, 0), Guid.NewGuid());
             var horaActual = new TimeSpan(9, 47, 0);
             var fecha = DateTime.Today.Add(horaActual);
 

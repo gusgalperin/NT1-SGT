@@ -9,5 +9,6 @@ namespace Domain.Core.Data.Repositories
     {
         Task<Turno> BuscarTurnoAsync(Guid idProfesional, DateTimeOffset fecha, TimeSpan horaInicio);
         Task<IEnumerable<Turno>> GetAllAsync(DateTimeOffset fecha);
+        Task<IEnumerable<Turno>> GetAllNoCanceladosAsync(DateTimeOffset fecha, Guid? profesionalId = null);
     }
 }

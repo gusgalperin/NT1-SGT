@@ -28,6 +28,7 @@ namespace Domain.Core.Queryes
 
         public class ObtenerProfesionalColaQueryResultItem
         {
+            public int Orden { get; set; }
             public Guid Id { get; set; }
             public Guid TurnoId { get; set; }
             public string Paciente { get; set; }
@@ -57,6 +58,7 @@ namespace Domain.Core.Queryes
                     .OrderBy(x => x.Orden)
                     .Select(x => new ObtenerProfesionalColaQueryResult.ObtenerProfesionalColaQueryResultItem
                     {
+                        Orden = x.Orden,
                         Id = x.Id,
                         TurnoId = x.Turno.Id,
                         HoraTurno = $"{x.Turno.HoraInicio.ToLegibleString()} {x.Turno.HoraFin.ToLegibleString()}",

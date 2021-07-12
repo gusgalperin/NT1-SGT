@@ -12,13 +12,13 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            Profesional
+            @Html.DisplayNameFor(model => model.ProfesionalNombre)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ProfesionalNombre)
         </dd>
         <dt class="col-sm-2">
-            Paciente
+            @Html.DisplayNameFor(model => model.PacienteNombre)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PacienteNombre)
@@ -45,10 +45,14 @@
             @Html.DisplayNameFor(model => model.Estado)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
+            @Model.Estado.ToNiceString()
         </dd>
     </dl>
 </div>
+
+<br /><br /><br />
+
+@await Html.PartialAsync("_TurnoHistorial", Model.Historial)
 
 <br />
 
@@ -56,11 +60,12 @@
 
     @foreach (var accion in Model.Acciones)
     {
-        @Html.ActionLink(accion.ToNiceString(), "EjecutarAccion", new { turnoId = Model.Id, accion = accion }, new { @class="btn btn-primary" })
+        @Html.ActionLink(accion.ToNiceString(), "EjecutarAccion", new { turnoId = Model.Id, accion = accion }, new { @class = "btn btn-primary" })
     }
 
     <br />
     <br />
 
-    <a asp-action="Index">Back to List</a>
+    @*<a asp-action="Index">Volver</a>*@
+    @Html.ActionLink("Volver", "Index", new { fecha = Model.Fecha})
 </div>

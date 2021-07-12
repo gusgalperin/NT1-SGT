@@ -1,0 +1,14 @@
+//turnos
+ver turnos
+crear turno
+editar turno
+checkin paciente
+llamar paciente
+fin de turno
+cancelar turno
+
+//pacientes
+ABM pacientes
+
+//profesionales
+ABM profesionales

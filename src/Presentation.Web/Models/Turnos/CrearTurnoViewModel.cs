@@ -10,6 +10,7 @@ namespace Presentation.Web.Models.Turnos
     {
         public IEnumerable<Profesional> Profesionales { get; set; }
 
+        [DataType(DataType.DateTime)]
         public DateTime Fecha { get; set; }
 
         [Display(Name = "Hora de inicio")]

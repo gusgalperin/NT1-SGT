@@ -1,4 +1,5 @@
 ﻿@model Presentation.Web.Models.Turnos.CrearTurnoViewModel
+@using Domain.Core.Helpers;
 
 @{
     ViewData["Title"] = "Nuevo turno";
@@ -21,34 +22,39 @@
 
     <label class="text-danger">@Model.ExceptionMessage</label>
 
-    <form asp-action="Nuevo">
+    <form asp-action="Crear">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <dl class="row">
-            <dt class="col-sm-4">
+            <dt class="col-sm-3">
                 <label asp-for="Fecha" class="control-label"></label>
             </dt>
-            <dd class="col-sm-8">
-                <input id="fecha" asp-for="Fecha" type="date" class="form-control" />
+            <dd class="col-sm-4">
+                <input id="fecha" asp-for="Fecha" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" value="@Model.Fecha.ToString("yyyy-MM-dd")" />
+
                 <span asp-validation-for="Fecha" class="text-danger"></span>
             </dd>
+            <dd class="col-sm-5"></dd>
 
-            <dt class="col-sm-4">
+            <dt class="col-sm-3">
                 <label asp-for="PacienteId" class="control-label"></label>
+                
             </dt>
-            <dd class="col-sm-8">
+            <dd class="col-sm-4">
                 <select id="slPacientes" asp-for="PacienteId"></select>
                 <span asp-validation-for="PacienteId" class="text-danger"></span>
+            </dd>
+            <dd class="col-sm-5">
                 <button type="button" id="btnCrearPaciente" class="btn btn-outline-primary btn-sm" data-url="@Url.Action("CrearPaciente")" data-toggle="modal" data-target="#modal-crear-paciente">
                     <i class="bi bi-person-plus"></i> Nuevo
                 </button>
             </dd>
 
-            <dt class="col-sm-4">
+            <dt class="col-sm-3">
                 <label asp-for="ProfesionalId" class="control-label"></label>
             </dt>
-            <dd class="col-sm-8">
-                <select id="slProfesionales" asp-for="ProfesionalId">
-                    <option>Elija profesional</option>
+            <dd class="col-sm-4">
+                <select id="slProfesionales" asp-for="ProfesionalId" class="form-control">
+                    <option></option>
                     @foreach (var profesional in Model.Profesionales)
                     {
                         <option value="@profesional.Id"
@@ -58,15 +64,20 @@
                     }
                 </select>
                 <span asp-validation-for="ProfesionalId" class="text-danger"></span>
+                <input type="hidden" id="selectedHoraInicio" value="@Model.HoraInicio" />
             </dd>
 
-            <dt class="col-sm-4">
+            <dd class="col-sm-5"></dd>
+
+            <dt class="col-sm-3">
                 <label asp-for="HoraInicio" class="control-label"></label>
             </dt>
-            <dd class="col-sm-8">
-                <select id="slHoraInicio" asp-for="HoraInicio"></select>
+            <dd class="col-sm-4">
+                <select id="slHoraInicio" asp-for="HoraInicio" class="form-control"></select>
                 <span asp-validation-for="HoraInicio" class="text-danger"></span>
             </dd>
+
+            <dd class="col-sm-5"></dd>
 
             <br />
             <br />
@@ -84,7 +95,7 @@
 <br />
 
 <div>
-    <a asp-action="Index">Volver al listado</a>
+    @Html.ActionLink("Volver", "Index", new { fecha = Model.Fecha })
 </div>
 
 @section Scripts {

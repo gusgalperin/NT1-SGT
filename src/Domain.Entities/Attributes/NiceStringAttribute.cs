@@ -19,5 +19,11 @@ namespace Domain.Entities
             return turnoAccion.GetAttribute<NiceStringAttribute>()?.Description 
                 ?? turnoAccion.ToString();
         }
+
+        public static string ToNiceString(this TurnoEstado estado)
+        {
+            return estado.GetAttribute<NiceStringAttribute>()?.Description
+                ?? estado.ToString();
+        }
     }
 }

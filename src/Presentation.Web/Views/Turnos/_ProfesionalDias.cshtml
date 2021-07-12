@@ -1,0 +1,11 @@
+﻿@model Domain.Core.Queryes.ObtenerCalendarioDelDiaQueryResult.Profesional
+@using Domain.Core.Helpers;
+
+<span>
+    @foreach (var dia in Model.DiasQueAtiende)
+    {
+        @(string.Format("{0} - {1}/{2}", dia.Dia.ToString(), dia.HoraDesde.ToLegibleString(), dia.HoraHasta.ToLegibleString()));
+        <br />
+    }
+    Turnos cada @Model.DuracionTurno.ToLegibleString() minutos
+</span>

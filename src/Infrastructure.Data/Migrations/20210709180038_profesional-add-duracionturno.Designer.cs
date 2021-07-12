@@ -4,14 +4,16 @@ using Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210709180038_profesional-add-duracionturno")]
+    partial class profesionaladdduracionturno
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,39 +205,6 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("Turno");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TurnoHistorial", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Accion")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EstadoDesde")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EstadoHasta")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("TurnoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TurnoId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("TurnoHistorial");
-                });
-
             modelBuilder.Entity("Domain.Entities.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -384,25 +353,6 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Profesional");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TurnoHistorial", b =>
-                {
-                    b.HasOne("Domain.Entities.Turno", "Turno")
-                        .WithMany("Historial")
-                        .HasForeignKey("TurnoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Turno");
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("Domain.Entities.Usuario", b =>
                 {
                     b.HasOne("Domain.Entities.Rol", "Rol")
@@ -425,11 +375,6 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.Rol", b =>
                 {
                     b.Navigation("Permisos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Turno", b =>
-                {
-                    b.Navigation("Historial");
                 });
 
             modelBuilder.Entity("Domain.Entities.Profesional", b =>

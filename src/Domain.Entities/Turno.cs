@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Entities
 {
@@ -8,7 +9,7 @@ namespace Domain.Entities
         protected Turno()
         { }
 
-        public Turno(Guid idProfesional, Guid idPaciente, DateTime fecha, TimeSpan horaInicio, TimeSpan horaFin)
+        public Turno(Guid idProfesional, Guid idPaciente, DateTime fecha, TimeSpan horaInicio, TimeSpan horaFin, Guid usuarioId)
             : base(Guid.NewGuid())
         {
             ProfesionalId = idProfesional;
@@ -17,6 +18,8 @@ namespace Domain.Entities
             HoraInicio = horaInicio;
             HoraFin = horaFin;
             Estado = TurnoEstado.Pendiente;
+
+            Historial = new List<TurnoHistorial> { new TurnoHistorial(null, TurnoAccion.Crear, Estado, usuarioId) };
         }
 
         public Guid ProfesionalId { get; private set; }
@@ -32,13 +35,19 @@ namespace Domain.Entities
         public Profesional Profesional { get; private set; }
         public Paciente Paciente { get; private set; }
 
+        public ICollection<TurnoHistorial> Historial { get; private set; }
+
         public DateTime FechaHoraInicio => Fecha.Add(HoraFin);
 
         public IEnumerable<TurnoAccion> AccionesPosibles 
             => TurnoEstadoMachine.ObtenerPosiblesAcciones(Estado);
 
-        public void CambiarEstado(TurnoAccion accion)
-            => Estado = TurnoEstadoMachine.ObtenerProximoEstado(Estado, accion);
+        public void CambiarEstado(TurnoAccion accion, Guid usuarioId)
+        {
+            var estadoAcutal = Estado;
+            Estado = TurnoEstadoMachine.ObtenerProximoEstado(Estado, accion);
+            Historial.Add(new TurnoHistorial(estadoAcutal, accion, Estado, usuarioId));
+        }
 
         public bool SePuede(TurnoAccion accion)
             => TurnoEstadoMachine.TransicionPosible(Estado, accion);
@@ -46,10 +55,19 @@ namespace Domain.Entities
 
     public enum TurnoEstado
     {
+        [NiceString("Pendiente")]
         Pendiente,
+        
+        [NiceString("En espera")]
         Encolado,
+        
+        [NiceString("En atención")]
         EnAtencion,
+        
+        [NiceString("Finalizado")]
         Finalizado,
+
+        [NiceString("Cancelado")]
         Cancelado,
     }
 
@@ -69,6 +87,10 @@ namespace Domain.Entities
         
         [NiceString("Cancelar")]
         [RequierePermiso("turno.cancelar")]
-        Cancelar
+        Cancelar,
+
+        [NiceString("Crear")]
+        [RequierePermiso("turno.crear")]
+        Crear
     }
 }

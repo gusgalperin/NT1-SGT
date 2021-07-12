@@ -1,0 +1,126 @@
+﻿@model Domain.Core.Queryes.ObtenerCalendarioDelDiaQueryResult
+@using Domain.Core.Helpers;
+@using Domain.Entities;
+
+@{
+    ViewData["Title"] = "Turnos";
+}
+
+<h1>Agenda del día</h1>
+
+<br />
+
+<div class="container">
+    <form asp-action="Index">
+        <div class="row justify-content-start">
+            <div class="col-4">
+                <div class="input-group mb-3">
+                    <input id="fecha" asp-for="Fecha" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control" value="@Model.Fecha.ToString("yyyy-MM-dd")" />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-8">
+                @if (User.Puede(Domain.Entities.Permiso.CrearTurno))
+                {
+                    <a asp-action="Nuevo" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Crear nuevo
+                    </a>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+
+<br />
+
+@foreach (var profesional in Model.Profesionales)
+{
+    <div>
+        <h3>
+            <span rel="tooltip" data-original-title='@await Html.PartialAsync("_ProfesionalDias", profesional)'>
+                @profesional.ProfesionalNombre
+            </span>
+        </h3>
+    </div>
+
+    @if (profesional.Atiende)
+    {
+        <div class="calendario">
+            <ul>
+                @foreach (var horario in profesional.Horarios)
+                {
+                    @if (horario.Turno == null && !horario.SePuedeAsigar)
+                        continue;
+
+                    <li class="horario-content estado-@(horario.Turno != null ? horario.Turno.Estado.ToString().ToLower() : "disponible") ">
+
+                        <p class="hora">
+                            @horario.HoraInicio.ToLegibleString()
+                        </p>
+
+                        @if (horario.Turno != null)
+                        {
+                            <label>@horario.Turno.PacienteNombre</label><br />
+
+                            @if (User.Puede(Domain.Entities.Permiso.VerDetalleTurno))
+                            {
+                                <a href="@Url.Action("Detalle", "Turnos", new { id = horario.Turno.TurnoId })">
+                                    @horario.Turno.Estado.ToNiceString()
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <label>@horario.Turno.Estado.ToNiceString()</label>
+                            }
+
+                            <br />
+
+                            <ul id="accionesTurno" class="accionesTurno">
+                                @foreach (var accion in horario.Turno.Acciones)
+                                {
+                                    <li>
+                                        @Html.ActionLink(accion.ToNiceString(), "EjecutarAccion", new { turnoId = horario.Turno.TurnoId, accion = accion })
+                                    </li>
+
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <label>Disponible</label>
+
+                            <br />
+                            <ul id="accionesTurno" class="accionesTurno">
+                                @if (horario.SePuedeAsigar)
+                                {
+                                    @Html.ActionLink("Asignar", "Nuevo", new { fecha = Model.Fecha, profesionalId = profesional.Id, horaInicio = horario.HoraInicio })
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <label>El profesional no atiende</label>
+    }
+
+    <br />
+    <br />
+}
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("[rel=tooltip]").tooltip({ html: true });
+        });
+    </script>
+}

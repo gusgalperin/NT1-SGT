@@ -40,7 +40,8 @@ namespace Domain.Core.CqsModule.Registration
                 //Queries
                 .AddQuery<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult, ObtenerAgendaDelDiaQueryHandler>()
                 .AddQuery<ObtenerProfesionalColaQuery, ObtenerProfesionalColaQueryResult, ObtenerProfesionalColaQueryHandler>()
-                .AddQuery<ObtenerTurnoQuery, ObtenerTurnoQueryResult, ObtenerTurnoQueryHandler>();
+                .AddQuery<ObtenerTurnoQuery, ObtenerTurnoQueryResult, ObtenerTurnoQueryHandler>()
+                .AddQuery<ObtenerCalendarioDelDiaQuery, ObtenerCalendarioDelDiaQueryResult, ObtenerCalendarioDelDiaQueryHandler>();
         }
 
         private static IServiceCollection AddCommand<TCommand, TCommandHandler>(this IServiceCollection services)

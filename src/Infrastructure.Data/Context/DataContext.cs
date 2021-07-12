@@ -25,6 +25,7 @@ namespace Infrastructure.Data.Context
         public DbSet<DiaHorario> Horarios { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Permiso> Permisos { get; set; }
+        public DbSet<TurnoHistorial> TurnoHistorial { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
@@ -56,6 +57,7 @@ namespace Infrastructure.Data.Context
             builder.Entity<ProfesionalEspecialidad>().ToTable("ProfesionalEspecialidad");
             builder.Entity<Rol>().ToTable("Rol");
             builder.Entity<Permiso>().ToTable("Permiso");
+            builder.Entity<TurnoHistorial>().ToTable("TurnoHistorial");
         }
 
         private void BuildEspecialidad(ModelBuilder builder)
@@ -147,6 +149,20 @@ namespace Infrastructure.Data.Context
             builder.Entity<Turno>()
                 .Property(p => p.Fecha)
                 .HasColumnType("date");
+
+            builder.Entity<Turno>()
+                .HasMany(x => x.Historial)
+                .WithOne(x => x.Turno);
+
+            builder.Entity<TurnoHistorial>()
+                .HasOne(x => x.Turno)
+                .WithMany(x => x.Historial)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TurnoHistorial>()
+                .HasOne(x => x.Usuario)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private void BuildRol(ModelBuilder builder)

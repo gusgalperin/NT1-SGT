@@ -40,39 +40,47 @@ namespace Presentation.Web.Controllers
             _turnoRepository = turnoRepository ?? throw new ArgumentNullException(nameof(turnoRepository));
         }
 
-        public async Task<IActionResult> Index(DateTimeOffset? fecha = null)
-        {
-            var turnos = await _queryProcessor.ProcessQueryAsync<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>(
-                new ObtenerAgendaDelDiaQuery(fecha));
+        //public async Task<IActionResult> Index(DateTimeOffset? fecha = null)
+        //{
+        //    var turnos = await _queryProcessor.ProcessQueryAsync<ObtenerAgendaDelDiaQuery, ObtenerAgendaDelDiaResult>(
+        //        new ObtenerAgendaDelDiaQuery(fecha));
 
-            return View(TurnosViewModel.FromQuery(turnos));
+        //    return View(TurnosViewModel.FromQuery(turnos));
+        //}
+
+        public async Task<IActionResult> Index(DateTime? fecha = null)
+        {
+            var agenda = await _queryProcessor.ProcessQueryAsync<ObtenerCalendarioDelDiaQuery, ObtenerCalendarioDelDiaQueryResult>(
+                new ObtenerCalendarioDelDiaQuery(fecha ?? DateTime.Today));
+
+            return View("Index2", agenda);
         }
 
-        public async Task<IActionResult> Nuevo()
+        public async Task<IActionResult> Nuevo(CrearTurnoViewModel model)
         {
-            var viewModel = new CrearTurnoViewModel
-            {
-                Profesionales = await _profesionalRepository.GetAllAsync()
-            };
+            var viewModel = model ?? new CrearTurnoViewModel();
+
+            viewModel.Profesionales = await _profesionalRepository.GetAllAsync();
+            viewModel.Fecha = new DateTime(viewModel.Fecha.Year, viewModel.Fecha.Month, viewModel.Fecha.Day);
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Nuevo(CrearTurnoViewModel model)
+        public async Task<IActionResult> Crear(CrearTurnoViewModel model)
         {
             try
             {
                 await _commandProcessor.ProcessCommandAsync(model.ToCommand());
 
-                return RedirectToAction("Index", "Turnos");
+                return RedirectToAction("Index", "Turnos", new { fecha = model.Fecha });
             }
             catch (UserException ex)
             {
                 model.ExceptionMessage = $"No se pudo crear el turno: {ex.Message}";
                 model.Profesionales = await _profesionalRepository.GetAllAsync();
 
-                return View(model);
+                return View("Nuevo", model);
             }
         }
 

@@ -15,6 +15,10 @@
         btnCrearPaciente.addEventListener('click', (event) => {
             this.nuevoPacienteClick(btnCrearPaciente);
         });
+
+        if ($('#slProfesionales option:selected').val() != "") {
+            this.buscarHorarios($('#slProfesionales option:selected').val());
+        }
     }
 
     nuevoPacienteClick(btnCrearPaciente) {
@@ -94,10 +98,20 @@
 
     llenarHorarios(data) {
         var str = ""
+        var selectedHoraInicio = document.getElementById('selectedHoraInicio').value;
         for (var item of data) {
-            str += `<option value='${item.id}'>${item.text}</option>`;
+            if (item.id == selectedHoraInicio) {
+                str += `<option value='${item.id}' selected='selected'>${item.text}</option>`;
+            }
+            else {
+                str += `<option value='${item.id}'>${item.text}</option>`;
+            }
+
+            
         }
 
         document.getElementById("slHoraInicio").innerHTML = str; 
+
+        /*if (document.getElementById("slHoraInicio"))*/
     }
 }

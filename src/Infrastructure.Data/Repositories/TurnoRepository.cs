@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Core;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -19,18 +20,28 @@ namespace Infrastructure.Data.Repositories
         {
             return await _db.Turnos
                 .Where(x => x.ProfesionalId == idProfesional)
-                .Where(x => x.Fecha == fecha)
+                .Where(x => x.Fecha == fecha.Date)
                 .Where(x => x.HoraInicio == horaInicio)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Turno>> GetAllAsync(DateTimeOffset fecha)
         {
-            return await _db.Turnos
+            return await GetAllQuery()
                 .Where(x => x.Fecha == fecha.Date)
-                .Include(x => x.Paciente)
-                .Include(x => x.Profesional)
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Turno>> GetAllNoCanceladosAsync(DateTimeOffset fecha, Guid? profesionalId = null)
+        {
+            var query = GetAllQuery()
+                .Where(x => x.Fecha == fecha.Date)
+                .Where(x => x.Estado != TurnoEstado.Cancelado);
+
+            if (profesionalId.HasValue)
+                query = query.Where(x => profesionalId.HasValue && x.ProfesionalId == profesionalId.Value);
+                
+            return await query.ToListAsync();
         }
 
         public override async Task<Turno> GetOneAsync(Guid id)
@@ -39,7 +50,17 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Paciente)
                 .Include(x => x.Profesional)
                 .Include(x => x.Profesional.Cola)
+                .Include(x => x.Historial)
+                .Include("Historial.Usuario")
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        private IQueryable<Turno> GetAllQuery()
+        {
+            return _db.Turnos
+               .Include(x => x.Paciente)
+               .Include(x => x.Profesional)
+               .Include(x => x.Profesional.DiasQueAtiende);
         }
     }
 }

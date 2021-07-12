@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Domain.Entities.TurnoHistorial>
+@using Domain.Core.Helpers;
+@using Domain.Entities;
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-5">Historial</h4>
+
+                    <div class="hori-timeline" dir="ltr">
+                        <ul class="list-inline events">
+
+                            @foreach (var log in Model)
+                            {
+                                <li class="list-inline-item event-list">
+                                    <div class="px-4">
+                                        <div class="event-date text-primary estado-@log.EstadoHasta.ToString().ToLower()">
+                                            @log.EstadoHasta.ToNiceString()
+
+                                        </div>
+
+                                        <h5 class="font-size-16">
+                                            <label>@log.Fecha.ToShortDateString()</label>
+                                            <br />
+                                            <label>@log.Fecha.TimeOfDay.ToLegibleString()</label>
+                                        </h5>
+
+                                        <p class="text-muted">Quien: @log.Usuario.Nombre</p>
+                                        <p class="text-muted">Que: @log.Accion.ToNiceString()</p>
+
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- end card -->
+        </div>
+    </div>

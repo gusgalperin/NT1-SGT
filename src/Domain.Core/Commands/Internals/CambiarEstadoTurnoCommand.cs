@@ -50,7 +50,7 @@ namespace Domain.Core.Commands.Internals
             if (!command.Turno.SePuede(command.Accion))
                 throw new UserException("No se puede ejecutar la acción sobre el turno");
 
-            command.Turno.CambiarEstado(command.Accion);
+            command.Turno.CambiarEstado(command.Accion, _authenticatedUser.UserInfo.Id);
 
             await _unitOfWork.Turnos.UpdateAsync(command.Turno);
 

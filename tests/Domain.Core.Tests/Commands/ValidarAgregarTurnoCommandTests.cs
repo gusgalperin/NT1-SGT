@@ -110,7 +110,7 @@ namespace Domain.Core.Tests.Commands
                 .Setup(x => x.GetOneAsync(command.ProfesionalId))
                 .ReturnsAsync(profesional);
 
-            var turno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, new TimeSpan(), new TimeSpan());
+            var turno = new Turno(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, new TimeSpan(), new TimeSpan(), Guid.NewGuid());
 
             turnoRepoMock
                 .Setup(x => x.BuscarTurnoAsync(command.ProfesionalId, command.Fecha, command.HoraInicio))

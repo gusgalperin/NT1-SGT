@@ -13,5 +13,10 @@ namespace Domain.Core
 
             return source;
         }
+
+        public static IEnumerable<TSource> Add<TSource>(this IEnumerable<TSource> source, TSource item)
+        {
+            return source.Concat(new[] { item });
+        }
     }
 }

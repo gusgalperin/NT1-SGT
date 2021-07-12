@@ -11,11 +11,11 @@ namespace Domain.Entities
         public ICollection<ProfesionalCola> Cola { get; private set; }
         public ICollection<Turno> Turnos { get; private set; }
 
-        public TimeSpan DuracionTurno => TimeSpan.FromMinutes(30);
+        public TimeSpan DuracionTurno { get; private set; }
 
         protected Profesional() { }
 
-        public Profesional(string nombre, string email, string password, IEnumerable<Especialidad> especialidades, ICollection<DiaHorario> diasQueAtiende)
+        public Profesional(string nombre, string email, string password, IEnumerable<Especialidad> especialidades, ICollection<DiaHorario> diasQueAtiende, TimeSpan? duractionTurno = null)
             : base (Rol.Profesional(), nombre, email, password)
         {
             if (especialidades == null || !especialidades.Any())
@@ -30,6 +30,7 @@ namespace Domain.Entities
 
             Especialidades = especialidades.Select(x => new ProfesionalEspecialidad(x.Id)).ToList();
             DiasQueAtiende = diasQueAtiende;
+            DuracionTurno = duractionTurno ?? TimeSpan.FromMinutes(30);
         }
 
         public bool Atiende(DateTimeOffset fecha, TimeSpan hora)
@@ -39,6 +40,11 @@ namespace Domain.Entities
                 .Where(x => hora >= x.HoraDesde)
                 .Where(x => hora <= x.HoraHasta)
                 .Any();
+        }
+
+        public bool Atiende(DateTimeOffset fecha)
+        {
+            return DiasQueAtiende.Any(x => x.Dia == fecha.DayOfWeek);
         }
 
         public void EncolarPaciente(Turno turno, DateTime horaActual, TimeSpan tolerancia)

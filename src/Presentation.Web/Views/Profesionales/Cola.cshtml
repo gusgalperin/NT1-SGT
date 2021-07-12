@@ -10,6 +10,9 @@
     <thead>
         <tr>
             <th>
+                Orden
+            </th>
+            <th>
                 Turno
             </th>
             <th>
@@ -27,20 +30,23 @@
     <tbody>
         @foreach (var item in Model.Cola)
         {
-            <tr>
-                <td>
-                    @Html.ActionLink(item.TurnoId.ToString(), "Detalle", "Turnos", new { id = item.TurnoId })
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Paciente)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HoraLlegada)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HoraTurno)
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Orden)
+            </td>
+            <td>
+                @Html.ActionLink(item.TurnoId.ToString(), "Detalle", "Turnos", new { id = item.TurnoId })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Paciente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoraLlegada)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoraTurno)
+            </td>
+        </tr>
         }
     </tbody>
 </table>
