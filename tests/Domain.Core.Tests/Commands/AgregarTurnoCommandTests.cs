@@ -57,7 +57,6 @@ namespace Domain.Core.Tests.Commands
             created.PacienteId.Should().Be(command.IdPaciente);
             created.Fecha.Should().Be(command.Fecha);
             created.HoraInicio.Should().Be(command.HoraInicio);
-            created.HoraFin.Should().Be(command.HoraInicio.Add(profesional.DuracionTurno));
 
             turnoRepoMock.Verify(x => x.AddAsync(It.IsAny<Turno>()), Times.Once);
             uowMock.Verify(x => x.SaveChangesAsync(), Times.Once);
