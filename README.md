@@ -1,4 +1,4 @@
-# NT1- Sistema de gesti�n de turnos (SGT)
+# NT1- Sistema de gestión de turnos (SGT)
 
 ## Roles
 
